@@ -1,0 +1,75 @@
+{
+    "apiVersion": "1.0.0", 
+    "datatypes": {
+        "a1c1bb78-83f8-11e5-8fc9-3c15c2da029e": {
+            "alias": [
+                "/dtype_compound"
+            ], 
+            "type": {
+                "class": "H5T_COMPOUND", 
+                "fields": [
+                    {
+                        "name": "temp", 
+                        "type": {
+                            "base": "H5T_STD_I32LE", 
+                            "class": "H5T_INTEGER"
+                        }
+                    }, 
+                    {
+                        "name": "pressure", 
+                        "type": {
+                            "base": "H5T_IEEE_F32LE", 
+                            "class": "H5T_FLOAT"
+                        }
+                    }
+                ]
+            }
+        }, 
+        "a1c1d20c-83f8-11e5-bf09-3c15c2da029e": {
+            "alias": [
+                "/dtype_simple"
+            ], 
+            "attributes": [
+                {
+                    "name": "note", 
+                    "shape": {
+                        "class": "H5S_SCALAR"
+                    }, 
+                    "type": {
+                        "charSet": "H5T_CSET_ASCII", 
+                        "class": "H5T_STRING", 
+                        "length": "H5T_VARIABLE", 
+                        "strPad": "H5T_STR_NULLTERM"
+                    }, 
+                    "value": "this is a committed datatype of float32"
+                }
+            ], 
+            "type": {
+                "base": "H5T_IEEE_F32LE", 
+                "class": "H5T_FLOAT"
+            }
+        }
+    }, 
+    "groups": {
+        "a1c06078-83f8-11e5-801a-3c15c2da029e": {
+            "alias": [
+                "/"
+            ], 
+            "links": [
+                {
+                    "class": "H5L_TYPE_HARD", 
+                    "collection": "datatypes", 
+                    "id": "a1c1bb78-83f8-11e5-8fc9-3c15c2da029e", 
+                    "title": "dtype_compound"
+                }, 
+                {
+                    "class": "H5L_TYPE_HARD", 
+                    "collection": "datatypes", 
+                    "id": "a1c1d20c-83f8-11e5-bf09-3c15c2da029e", 
+                    "title": "dtype_simple"
+                }
+            ]
+        }
+    }, 
+    "root": "a1c06078-83f8-11e5-801a-3c15c2da029e"
+}

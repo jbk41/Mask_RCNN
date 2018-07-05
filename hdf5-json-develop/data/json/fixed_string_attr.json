@@ -1,0 +1,64 @@
+{
+    "apiVersion": "1.0.0", 
+    "datasets": {
+        "9fddd6ae-83f8-11e5-ba18-3c15c2da029e": {
+            "alias": [
+                "/DS1"
+            ], 
+            "attributes": [
+                {
+                    "name": "A1", 
+                    "shape": {
+                        "class": "H5S_SIMPLE", 
+                        "dims": [
+                            4
+                        ]
+                    }, 
+                    "type": {
+                        "charSet": "H5T_CSET_ASCII", 
+                        "class": "H5T_STRING", 
+                        "length": 7, 
+                        "strPad": "H5T_STR_NULLPAD"
+                    }, 
+                    "value": [
+                        "Parting", 
+                        "is such", 
+                        "sweet", 
+                        "sorrow."
+                    ]
+                }
+            ], 
+            "creationProperties": {
+                "allocTime": "H5D_ALLOC_TIME_LATE", 
+                "fillTime": "H5D_FILL_TIME_IFSET", 
+                "layout": {
+                    "class": "H5D_CONTIGUOUS"
+                }
+            }, 
+            "shape": {
+                "class": "H5S_NULL"
+            }, 
+            "type": {
+                "base": "H5T_STD_I32LE", 
+                "class": "H5T_INTEGER"
+            }, 
+            "value": null
+        }
+    }, 
+    "groups": {
+        "9fdc6f7d-83f8-11e5-ae8a-3c15c2da029e": {
+            "alias": [
+                "/"
+            ], 
+            "links": [
+                {
+                    "class": "H5L_TYPE_HARD", 
+                    "collection": "datasets", 
+                    "id": "9fddd6ae-83f8-11e5-ba18-3c15c2da029e", 
+                    "title": "DS1"
+                }
+            ]
+        }
+    }, 
+    "root": "9fdc6f7d-83f8-11e5-ae8a-3c15c2da029e"
+}

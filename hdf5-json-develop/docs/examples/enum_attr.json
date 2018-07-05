@@ -1,0 +1,68 @@
+{
+    "apiVersion": "0.0.0",
+    "datasets": {
+        "a615cf0a-7b51-11e4-bc7e-3c15c2da029e": {
+            "attributes": [
+                {
+                    "name": "A1", 
+                    "shape": {
+                        "class": "H5S_SIMPLE", 
+                        "dims": [4, 7]
+                    }, 
+                    "type": {
+                        "base": {
+                            "base": "H5T_STD_I16BE", 
+                            "class": "H5T_INTEGER"
+                        }, 
+                        "class": "H5T_ENUM", 
+                        "members": [
+                            {
+                                "name": "GAS",
+                                "value": 2
+                            },
+                            {
+                                "name": "LIQUID",
+                                "value": 1
+                            },
+                            {
+                                "name": "PLASMA",
+                                "value": 3
+                            },
+                            {
+                                "name": "SOLID",
+                                "value": 0
+                            }
+                        ]
+                    }, 
+                    "value": [
+                        [0, 0, 0, 0, 0, 0, 0], 
+                        [0, 1, 2, 3, 0, 1, 2], 
+                        [0, 2, 0, 2, 0, 2, 0], 
+                        [0, 3, 2, 1, 0, 3, 2]
+                    ]
+                }
+            ], 
+            "shape": {
+                "class": "H5S_NULL"
+            }, 
+            "type": {
+                "base": "H5T_STD_I32LE", 
+                "class": "H5T_INTEGER"
+            }, 
+            "value": null
+        }
+    }, 
+    "groups": {
+        "a614dc9c-7b51-11e4-a3f7-3c15c2da029e": {
+            "links": [
+                {
+		    "class": "H5L_TYPE_HARD",
+                    "title": "DS1",
+		    "collection": "datasets",
+                    "id": "a615cf0a-7b51-11e4-bc7e-3c15c2da029e"
+                }
+            ]
+        }
+    }, 
+    "root": "a614dc9c-7b51-11e4-a3f7-3c15c2da029e"
+}

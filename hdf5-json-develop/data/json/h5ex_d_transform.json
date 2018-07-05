@@ -1,0 +1,82 @@
+{
+    "apiVersion": "1.0.0", 
+    "datasets": {
+        "a157dd14-83f8-11e5-a678-3c15c2da029e": {
+            "alias": [
+                "/DS1"
+            ], 
+            "creationProperties": {
+                "allocTime": "H5D_ALLOC_TIME_LATE", 
+                "fillTime": "H5D_FILL_TIME_IFSET", 
+                "layout": {
+                    "class": "H5D_CONTIGUOUS"
+                }
+            }, 
+            "shape": {
+                "class": "H5S_SIMPLE", 
+                "dims": [
+                    4, 
+                    7
+                ]
+            }, 
+            "type": {
+                "base": "H5T_STD_I32LE", 
+                "class": "H5T_INTEGER"
+            }, 
+            "value": [
+                [
+                    1, 
+                    0, 
+                    -1, 
+                    -2, 
+                    -3, 
+                    -4, 
+                    -5
+                ], 
+                [
+                    1, 
+                    1, 
+                    1, 
+                    1, 
+                    1, 
+                    1, 
+                    1
+                ], 
+                [
+                    1, 
+                    2, 
+                    3, 
+                    4, 
+                    5, 
+                    6, 
+                    7
+                ], 
+                [
+                    1, 
+                    3, 
+                    5, 
+                    7, 
+                    9, 
+                    11, 
+                    13
+                ]
+            ]
+        }
+    }, 
+    "groups": {
+        "a156aa40-83f8-11e5-abcd-3c15c2da029e": {
+            "alias": [
+                "/"
+            ], 
+            "links": [
+                {
+                    "class": "H5L_TYPE_HARD", 
+                    "collection": "datasets", 
+                    "id": "a157dd14-83f8-11e5-a678-3c15c2da029e", 
+                    "title": "DS1"
+                }
+            ]
+        }
+    }, 
+    "root": "a156aa40-83f8-11e5-abcd-3c15c2da029e"
+}

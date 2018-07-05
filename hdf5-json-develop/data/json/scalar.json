@@ -1,0 +1,159 @@
+{
+    "apiVersion": "1.0.0", 
+    "datasets": {
+        "a2e9ad61-83f8-11e5-a5f5-3c15c2da029e": {
+            "alias": [
+                "/0d"
+            ], 
+            "creationProperties": {
+                "allocTime": "H5D_ALLOC_TIME_LATE", 
+                "fillTime": "H5D_FILL_TIME_IFSET", 
+                "layout": {
+                    "class": "H5D_CONTIGUOUS"
+                }
+            }, 
+            "shape": {
+                "class": "H5S_SCALAR"
+            }, 
+            "type": {
+                "base": "H5T_STD_I32LE", 
+                "class": "H5T_INTEGER"
+            }, 
+            "value": 42
+        }, 
+        "a2e9db14-83f8-11e5-8074-3c15c2da029e": {
+            "alias": [
+                "/0ds"
+            ], 
+            "creationProperties": {
+                "allocTime": "H5D_ALLOC_TIME_LATE", 
+                "fillTime": "H5D_FILL_TIME_ALLOC", 
+                "layout": {
+                    "class": "H5D_CONTIGUOUS"
+                }
+            }, 
+            "shape": {
+                "class": "H5S_SCALAR"
+            }, 
+            "type": {
+                "charSet": "H5T_CSET_ASCII", 
+                "class": "H5T_STRING", 
+                "length": "H5T_VARIABLE", 
+                "strPad": "H5T_STR_NULLTERM"
+            }, 
+            "value": "hello"
+        }, 
+        "a2e9ff05-83f8-11e5-a966-3c15c2da029e": {
+            "alias": [
+                "/1d"
+            ], 
+            "creationProperties": {
+                "allocTime": "H5D_ALLOC_TIME_LATE", 
+                "fillTime": "H5D_FILL_TIME_IFSET", 
+                "layout": {
+                    "class": "H5D_CONTIGUOUS"
+                }
+            }, 
+            "shape": {
+                "class": "H5S_SIMPLE", 
+                "dims": [
+                    1
+                ]
+            }, 
+            "type": {
+                "base": "H5T_STD_I32LE", 
+                "class": "H5T_INTEGER"
+            }, 
+            "value": [
+                42
+            ]
+        }, 
+        "a2ea1868-83f8-11e5-86ec-3c15c2da029e": {
+            "alias": [
+                "/1ds"
+            ], 
+            "creationProperties": {
+                "allocTime": "H5D_ALLOC_TIME_LATE", 
+                "fillTime": "H5D_FILL_TIME_ALLOC", 
+                "layout": {
+                    "class": "H5D_CONTIGUOUS"
+                }
+            }, 
+            "shape": {
+                "class": "H5S_SIMPLE", 
+                "dims": [
+                    1
+                ]
+            }, 
+            "type": {
+                "charSet": "H5T_CSET_ASCII", 
+                "class": "H5T_STRING", 
+                "length": "H5T_VARIABLE", 
+                "strPad": "H5T_STR_NULLTERM"
+            }, 
+            "value": [
+                "hello"
+            ]
+        }
+    }, 
+    "groups": {
+        "a2e89dbd-83f8-11e5-8b79-3c15c2da029e": {
+            "alias": [
+                "/"
+            ], 
+            "attributes": [
+                {
+                    "name": "attr1", 
+                    "shape": {
+                        "class": "H5S_SCALAR"
+                    }, 
+                    "type": {
+                        "base": "H5T_STD_I64LE", 
+                        "class": "H5T_INTEGER"
+                    }, 
+                    "value": 42
+                }, 
+                {
+                    "name": "attr2", 
+                    "shape": {
+                        "class": "H5S_SCALAR"
+                    }, 
+                    "type": {
+                        "charSet": "H5T_CSET_ASCII", 
+                        "class": "H5T_STRING", 
+                        "length": "H5T_VARIABLE", 
+                        "strPad": "H5T_STR_NULLTERM"
+                    }, 
+                    "value": "hello"
+                }
+            ], 
+            "links": [
+                {
+                    "class": "H5L_TYPE_HARD", 
+                    "collection": "datasets", 
+                    "id": "a2e9ad61-83f8-11e5-a5f5-3c15c2da029e", 
+                    "title": "0d"
+                }, 
+                {
+                    "class": "H5L_TYPE_HARD", 
+                    "collection": "datasets", 
+                    "id": "a2e9db14-83f8-11e5-8074-3c15c2da029e", 
+                    "title": "0ds"
+                }, 
+                {
+                    "class": "H5L_TYPE_HARD", 
+                    "collection": "datasets", 
+                    "id": "a2e9ff05-83f8-11e5-a966-3c15c2da029e", 
+                    "title": "1d"
+                }, 
+                {
+                    "class": "H5L_TYPE_HARD", 
+                    "collection": "datasets", 
+                    "id": "a2ea1868-83f8-11e5-86ec-3c15c2da029e", 
+                    "title": "1ds"
+                }
+            ]
+        }
+    }, 
+    "root": "a2e89dbd-83f8-11e5-8b79-3c15c2da029e"
+}

@@ -1,0 +1,15 @@
+[-] Unloading CUDA Toolkit  9.0.176  ... 
+[+] Loading CUDA Toolkit  9.0.176  ... 
+[-] Unloading cuDNN 7.0  libraries... 
+[+] Loading cuDNN 7.0  libraries... 
+2018-07-05 11:02:31.732034: I tensorflow/core/platform/cpu_feature_guard.cc:140] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-07-05 11:02:32.254787: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1356] Found device 0 with properties: 
+name: Tesla P100-PCIE-16GB major: 6 minor: 0 memoryClockRate(GHz): 1.3285
+pciBusID: 0000:0d:00.0
+totalMemory: 15.89GiB freeMemory: 15.60GiB
+2018-07-05 11:02:32.254865: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1435] Adding visible gpu devices: 0
+2018-07-05 11:02:37.020101: I tensorflow/core/common_runtime/gpu/gpu_device.cc:923] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-07-05 11:02:37.020229: I tensorflow/core/common_runtime/gpu/gpu_device.cc:929]      0 
+2018-07-05 11:02:37.020285: I tensorflow/core/common_runtime/gpu/gpu_device.cc:942] 0:   N 
+2018-07-05 11:02:37.050750: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1053] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 15127 MB memory) -> physical GPU (device: 0, name: Tesla P100-PCIE-16GB, pci bus id: 0000:0d:00.0, compute capability: 6.0)
+slurmstepd: error: *** JOB 4715573 ON cn2375 CANCELLED AT 2018-07-05T11:16:59 ***

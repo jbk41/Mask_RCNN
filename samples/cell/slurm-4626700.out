@@ -1,0 +1,111 @@
+[+] Loading CUDA Toolkit  9.0.176  ... 
+[+] Loading cuDNN 7.0  libraries... 
+2018-07-03 14:27:05.281850: I tensorflow/core/platform/cpu_feature_guard.cc:140] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-07-03 14:27:06.045819: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1356] Found device 0 with properties: 
+name: Tesla V100-PCIE-16GB major: 7 minor: 0 memoryClockRate(GHz): 1.38
+pciBusID: 0000:0d:00.0
+totalMemory: 15.77GiB freeMemory: 15.35GiB
+2018-07-03 14:27:06.045896: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1435] Adding visible gpu devices: 0
+2018-07-03 14:27:12.388990: I tensorflow/core/common_runtime/gpu/gpu_device.cc:923] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-07-03 14:27:12.389077: I tensorflow/core/common_runtime/gpu/gpu_device.cc:929]      0 
+2018-07-03 14:27:12.389108: I tensorflow/core/common_runtime/gpu/gpu_device.cc:942] 0:   N 
+2018-07-03 14:27:12.430959: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1053] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 14866 MB memory) -> physical GPU (device: 0, name: Tesla V100-PCIE-16GB, pci bus id: 0000:0d:00.0, compute capability: 7.0)
+
+Configurations:
+BACKBONE                       resnet101
+BACKBONE_STRIDES               [4, 8, 16, 32, 64]
+BATCH_SIZE                     2
+BBOX_STD_DEV                   [0.1 0.1 0.2 0.2]
+COMPUTE_BACKBONE_SHAPE         None
+DETECTION_MAX_INSTANCES        100
+DETECTION_MIN_CONFIDENCE       0.7
+DETECTION_NMS_THRESHOLD        0.3
+FPN_CLASSIF_FC_LAYERS_SIZE     1024
+GPU_COUNT                      1
+GRADIENT_CLIP_NORM             5.0
+IMAGES_PER_GPU                 2
+IMAGE_MAX_DIM                  1024
+IMAGE_META_SIZE                14
+IMAGE_MIN_DIM                  256
+IMAGE_MIN_SCALE                0
+IMAGE_RESIZE_MODE              square
+IMAGE_SHAPE                    [1024 1024    3]
+LEARNING_MOMENTUM              0.9
+LEARNING_RATE                  0.0001
+LOSS_WEIGHTS                   {'rpn_bbox_loss': 1.0, 'mrcnn_bbox_loss': 1.0, 'mrcnn_mask_loss': 1.0, 'rpn_class_loss': 1.0, 'mrcnn_class_loss': 1.0}
+MASK_POOL_SIZE                 14
+MASK_SHAPE                     [28, 28]
+MAX_GT_INSTANCES               100
+MEAN_PIXEL                     [123.7 116.8 103.9]
+MINI_MASK_SHAPE                (56, 56)
+NAME                           cells
+NUM_CLASSES                    2
+POOL_SIZE                      7
+POST_NMS_ROIS_INFERENCE        1000
+POST_NMS_ROIS_TRAINING         2000
+ROI_POSITIVE_RATIO             0.33
+RPN_ANCHOR_RATIOS              [0.5, 1, 2]
+RPN_ANCHOR_SCALES              (8, 16, 32, 64, 128)
+RPN_ANCHOR_STRIDE              1
+RPN_BBOX_STD_DEV               [0.1 0.1 0.2 0.2]
+RPN_NMS_THRESHOLD              0.7
+RPN_TRAIN_ANCHORS_PER_IMAGE    256
+STEPS_PER_EPOCH                1000
+TOP_DOWN_PYRAMID_SIZE          256
+TRAIN_BN                       False
+TRAIN_ROIS_PER_IMAGE           200
+USE_MINI_MASK                  True
+USE_RPN_ROIS                   True
+VALIDATION_STEPS               50
+WEIGHT_DECAY                   0.0001
+
+
+initializing with coco
+before load weights
+after load weights
+
+Starting at epoch 0. LR=0.0001
+
+Checkpoint Path: /data/kimjb/Mask_RCNN/logs/cells20180703T1427/mask_rcnn_cells_{epoch:04d}.h5
+Selecting layers to train
+fpn_c5p5               (Conv2D)
+fpn_c4p4               (Conv2D)
+fpn_c3p3               (Conv2D)
+fpn_c2p2               (Conv2D)
+fpn_p5                 (Conv2D)
+fpn_p2                 (Conv2D)
+fpn_p3                 (Conv2D)
+fpn_p4                 (Conv2D)
+In model:  rpn_model
+    rpn_conv_shared        (Conv2D)
+    rpn_class_raw          (Conv2D)
+    rpn_bbox_pred          (Conv2D)
+mrcnn_mask_conv1       (TimeDistributed)
+mrcnn_mask_bn1         (TimeDistributed)
+mrcnn_mask_conv2       (TimeDistributed)
+mrcnn_mask_bn2         (TimeDistributed)
+mrcnn_class_conv1      (TimeDistributed)
+mrcnn_class_bn1        (TimeDistributed)
+mrcnn_mask_conv3       (TimeDistributed)
+mrcnn_mask_bn3         (TimeDistributed)
+mrcnn_class_conv2      (TimeDistributed)
+mrcnn_class_bn2        (TimeDistributed)
+mrcnn_mask_conv4       (TimeDistributed)
+mrcnn_mask_bn4         (TimeDistributed)
+mrcnn_bbox_fc          (TimeDistributed)
+mrcnn_mask_deconv      (TimeDistributed)
+mrcnn_class_logits     (TimeDistributed)
+mrcnn_mask             (TimeDistributed)
+Epoch 1/100
+ - 1118s - loss: 1.2203 - rpn_class_loss: 0.0560 - rpn_bbox_loss: 0.7588 - mrcnn_class_loss: 0.0334 - mrcnn_bbox_loss: 0.1835 - mrcnn_mask_loss: 0.1887 - val_loss: 0.7802 - val_rpn_class_loss: 0.0182 - val_rpn_bbox_loss: 0.5949 - val_mrcnn_class_loss: 0.0189 - val_mrcnn_bbox_loss: 0.0777 - val_mrcnn_mask_loss: 0.0705
+Epoch 2/100
+ - 1059s - loss: 0.8424 - rpn_class_loss: 0.0192 - rpn_bbox_loss: 0.5734 - mrcnn_class_loss: 0.0297 - mrcnn_bbox_loss: 0.1036 - mrcnn_mask_loss: 0.1165 - val_loss: 0.7114 - val_rpn_class_loss: 0.0140 - val_rpn_bbox_loss: 0.5263 - val_mrcnn_class_loss: 0.0280 - val_mrcnn_bbox_loss: 0.0694 - val_mrcnn_mask_loss: 0.0737
+Epoch 3/100
+ - 1078s - loss: 0.8034 - rpn_class_loss: 0.0166 - rpn_bbox_loss: 0.5245 - mrcnn_class_loss: 0.0384 - mrcnn_bbox_loss: 0.1006 - mrcnn_mask_loss: 0.1232 - val_loss: 0.6927 - val_rpn_class_loss: 0.0126 - val_rpn_bbox_loss: 0.5028 - val_mrcnn_class_loss: 0.0335 - val_mrcnn_bbox_loss: 0.0698 - val_mrcnn_mask_loss: 0.0739
+Epoch 4/100
+ - 1106s - loss: 0.7768 - rpn_class_loss: 0.0145 - rpn_bbox_loss: 0.5008 - mrcnn_class_loss: 0.0427 - mrcnn_bbox_loss: 0.0967 - mrcnn_mask_loss: 0.1221 - val_loss: 0.6607 - val_rpn_class_loss: 0.0112 - val_rpn_bbox_loss: 0.4835 - val_mrcnn_class_loss: 0.0331 - val_mrcnn_bbox_loss: 0.0603 - val_mrcnn_mask_loss: 0.0725
+Epoch 5/100
+ - 1233s - loss: 0.7627 - rpn_class_loss: 0.0143 - rpn_bbox_loss: 0.4842 - mrcnn_class_loss: 0.0447 - mrcnn_bbox_loss: 0.0951 - mrcnn_mask_loss: 0.1243 - val_loss: 0.6425 - val_rpn_class_loss: 0.0085 - val_rpn_bbox_loss: 0.4668 - val_mrcnn_class_loss: 0.0370 - val_mrcnn_bbox_loss: 0.0576 - val_mrcnn_mask_loss: 0.0726
+Epoch 6/100
+ - 1291s - loss: 0.7254 - rpn_class_loss: 0.0129 - rpn_bbox_loss: 0.4667 - mrcnn_class_loss: 0.0445 - mrcnn_bbox_loss: 0.0855 - mrcnn_mask_loss: 0.1158 - val_loss: 0.6378 - val_rpn_class_loss: 0.0089 - val_rpn_bbox_loss: 0.4631 - val_mrcnn_class_loss: 0.0366 - val_mrcnn_bbox_loss: 0.0604 - val_mrcnn_mask_loss: 0.0688
+slurmstepd: error: *** JOB 4626700 ON cn4467 CANCELLED AT 2018-07-03T16:26:26 DUE TO TIME LIMIT ***

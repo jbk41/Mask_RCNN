@@ -74,9 +74,6 @@ def compute_backbone_shapes(config, image_shape):
     Returns:
         [N, (height, width)]. Where N is the number of stages
     """
-    if callable(config.BACKBONE):
-        return config.COMPUTE_BACKBONE_SHAPE(image_shape)
-
     # Currently supports ResNet only
     assert config.BACKBONE in ["resnet50", "resnet101"]
     return np.array(
@@ -563,11 +560,7 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
 
     # Assign positive ROIs to GT boxes.
     positive_overlaps = tf.gather(overlaps, positive_indices)
-    roi_gt_box_assignment = tf.cond(
-        tf.greater(tf.shape(positive_overlaps)[1], 0),
-        true_fn = lambda: tf.argmax(positive_overlaps, axis=1),
-        false_fn = lambda: tf.cast(tf.constant([]),tf.int64)
-    )
+    roi_gt_box_assignment = tf.argmax(positive_overlaps, axis=1)
     roi_gt_boxes = tf.gather(gt_boxes, roi_gt_box_assignment)
     roi_gt_class_ids = tf.gather(gt_class_ids, roi_gt_box_assignment)
 
@@ -901,8 +894,7 @@ def build_rpn_model(anchor_stride, anchors_per_location, depth):
 ############################################################
 
 def fpn_classifier_graph(rois, feature_maps, image_meta,
-                         pool_size, num_classes, train_bn=True,
-                         fc_layers_size=1024):
+                         pool_size, num_classes, train_bn=True):
     """Builds the computation graph of the feature pyramid network classifier
     and regressor heads.
 
@@ -914,7 +906,6 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     pool_size: The width of the square feature map generated from ROI Pooling.
     num_classes: number of classes, which determines the depth of the results
     train_bn: Boolean. Train or freeze Batch Norm layres
-    fc_layers_size: Size of the 2 FC layers
 
     Returns:
         logits: [N, NUM_CLASSES] classifier logits (before softmax)
@@ -927,11 +918,11 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     x = PyramidROIAlign([pool_size, pool_size],
                         name="roi_align_classifier")([rois, image_meta] + feature_maps)
     # Two 1024 FC layers (implemented with Conv2D for consistency)
-    x = KL.TimeDistributed(KL.Conv2D(fc_layers_size, (pool_size, pool_size), padding="valid"),
+    x = KL.TimeDistributed(KL.Conv2D(1024, (pool_size, pool_size), padding="valid"),
                            name="mrcnn_class_conv1")(x)
     x = KL.TimeDistributed(BatchNorm(), name='mrcnn_class_bn1')(x, training=train_bn)
     x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.Conv2D(fc_layers_size, (1, 1)),
+    x = KL.TimeDistributed(KL.Conv2D(1024, (1, 1)),
                            name="mrcnn_class_conv2")(x)
     x = KL.TimeDistributed(BatchNorm(), name='mrcnn_class_bn2')(x, training=train_bn)
     x = KL.Activation('relu')(x)
@@ -1888,29 +1879,25 @@ class MaskRCNN():
         # Bottom-up Layers
         # Returns a list of the last layers of each stage, 5 in total.
         # Don't create the thead (stage 5), so we pick the 4th item in the list.
-        if callable(config.BACKBONE):
-            _, C2, C3, C4, C5 = config.BACKBONE(input_image, stage5=True,
-                                                train_bn=config.TRAIN_BN)
-        else:
-            _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
-                                             stage5=True, train_bn=config.TRAIN_BN)
+        _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
+                                         stage5=True, train_bn=config.TRAIN_BN)
         # Top-down Layers
         # TODO: add assert to varify feature map sizes match what's in config
-        P5 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c5p5')(C5)
+        P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
         P4 = KL.Add(name="fpn_p4add")([
             KL.UpSampling2D(size=(2, 2), name="fpn_p5upsampled")(P5),
-            KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c4p4')(C4)])
+            KL.Conv2D(256, (1, 1), name='fpn_c4p4')(C4)])
         P3 = KL.Add(name="fpn_p3add")([
             KL.UpSampling2D(size=(2, 2), name="fpn_p4upsampled")(P4),
-            KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c3p3')(C3)])
+            KL.Conv2D(256, (1, 1), name='fpn_c3p3')(C3)])
         P2 = KL.Add(name="fpn_p2add")([
             KL.UpSampling2D(size=(2, 2), name="fpn_p3upsampled")(P3),
-            KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c2p2')(C2)])
+            KL.Conv2D(256, (1, 1), name='fpn_c2p2')(C2)])
         # Attach 3x3 conv to all P layers to get the final feature maps.
-        P2 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (3, 3), padding="SAME", name="fpn_p2")(P2)
-        P3 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (3, 3), padding="SAME", name="fpn_p3")(P3)
-        P4 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (3, 3), padding="SAME", name="fpn_p4")(P4)
-        P5 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (3, 3), padding="SAME", name="fpn_p5")(P5)
+        P2 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p2")(P2)
+        P3 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p3")(P3)
+        P4 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p4")(P4)
+        P5 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p5")(P5)
         # P6 is used for the 5th anchor scale in RPN. Generated by
         # subsampling from P5 with stride of 2.
         P6 = KL.MaxPooling2D(pool_size=(1, 1), strides=2, name="fpn_p6")(P5)
@@ -1932,7 +1919,7 @@ class MaskRCNN():
 
         # RPN Model
         rpn = build_rpn_model(config.RPN_ANCHOR_STRIDE,
-                              len(config.RPN_ANCHOR_RATIOS), config.TOP_DOWN_PYRAMID_SIZE)
+                              len(config.RPN_ANCHOR_RATIOS), 256)
         # Loop through pyramid layers
         layer_outputs = []  # list of lists
         for p in rpn_feature_maps:
@@ -1989,8 +1976,7 @@ class MaskRCNN():
             mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
                 fpn_classifier_graph(rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
-                                     train_bn=config.TRAIN_BN,
-                                     fc_layers_size=config.FPN_CLASSIF_FC_LAYERS_SIZE)
+                                     train_bn=config.TRAIN_BN)
 
             mrcnn_mask = build_fpn_mask_graph(rois, mrcnn_feature_maps,
                                               input_image_meta,
@@ -2029,8 +2015,7 @@ class MaskRCNN():
             mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
                 fpn_classifier_graph(rpn_rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
-                                     train_bn=config.TRAIN_BN,
-                                     fc_layers_size=config.FPN_CLASSIF_FC_LAYERS_SIZE)
+                                     train_bn=config.TRAIN_BN)
 
             # Detections
             # output is [batch, num_detections, (y1, x1, y2, x2, class_id, score)] in 
@@ -2062,7 +2047,8 @@ class MaskRCNN():
         """Finds the last checkpoint file of the last trained model in the
         model directory.
         Returns:
-            The path of the last checkpoint file
+            log_dir: The directory where events and weights are saved
+            checkpoint_path: the path to the last checkpoint file
         """
         # Get directory names. Each directory corresponds to a model
         dir_names = next(os.walk(self.model_dir))[1]
@@ -2070,10 +2056,7 @@ class MaskRCNN():
         dir_names = filter(lambda f: f.startswith(key), dir_names)
         dir_names = sorted(dir_names)
         if not dir_names:
-            import errno
-            raise FileNotFoundError(
-                errno.ENOENT,
-                "Could not find model directory under {}".format(self.model_dir))
+            return None, None
         # Pick last directory
         dir_name = os.path.join(self.model_dir, dir_names[-1])
         # Find the last checkpoint
@@ -2081,11 +2064,9 @@ class MaskRCNN():
         checkpoints = filter(lambda f: f.startswith("mask_rcnn"), checkpoints)
         checkpoints = sorted(checkpoints)
         if not checkpoints:
-            import errno
-            raise FileNotFoundError(
-                errno.ENOENT, "Could not find weight files in {}".format(dir_name))
+            return dir_name, None
         checkpoint = os.path.join(dir_name, checkpoints[-1])
-        return checkpoint
+        return dir_name, checkpoint
 
     def load_weights(self, filepath, by_name=False, exclude=None):
         """Modified version of the correspoding Keras function with
@@ -2094,7 +2075,7 @@ class MaskRCNN():
         exlude: list of layer names to excluce
         """
         import h5py
-        from keras.engine import topology
+        from keras.engine import topology 
 
         if exclude:
             by_name = True
@@ -2241,7 +2222,7 @@ class MaskRCNN():
             # Continue from we left of. Get epoch and date from the file name
             # A sample model path might look like:
             # /path/to/logs/coco20171029T2315/mask_rcnn_coco_0001.h5
-            regex = r".*/[\w-]+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/mask\_rcnn\_[\w-]+(\d{4})\.h5"
+            regex = r".*/\w+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/mask\_rcnn\_\w+(\d{4})\.h5"
             m = re.match(regex, model_path)
             if m:
                 now = datetime.datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
@@ -2249,21 +2230,19 @@ class MaskRCNN():
                 # Epoch number in file is 1-based, and in Keras code it's 0-based.
                 # So, adjust for that then increment by one to start from the next epoch
                 self.epoch = int(m.group(6)) - 1 + 1
-                print('Re-starting from epoch %d' % self.epoch)
 
         # Directory for training logs
         self.log_dir = os.path.join(self.model_dir, "{}{:%Y%m%dT%H%M}".format(
             self.config.NAME.lower(), now))
 
-        # Create log_dir if not exists
-        if not os.path.exists(self.log_dir):
-            os.makedirs(self.log_dir)
-
         # Path to save after each epoch. Include placeholders that get filled by Keras.
-        self.checkpoint_path = os.path.join(self.log_dir, "mask_rcnn_{}_*epoch*.h5".format(
+        self.checkpoint_path = os.path.join(self.log_dir, "mask_rcnn_{}*epoch*.h5".format(
             self.config.NAME.lower()))
+        #self.checkpoint_path = self.checkpoint_path.replace(
+        #    "*epoch*", "{epoch:04d}")
         self.checkpoint_path = self.checkpoint_path.replace(
-            "*epoch*", "{epoch:04d}")
+            "*epoch*", "")
+
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
               augmentation=None):
@@ -2277,7 +2256,7 @@ class MaskRCNN():
         layers: Allows selecting wich layers to train. It can be:
             - A regular expression to match layer names to train
             - One of these predefined values:
-              heads: The RPN, classifier and mask heads of the network
+              heaads: The RPN, classifier and mask heads of the network
               all: All the layers
               3+: Train Resnet stage 3 and up
               4+: Train Resnet stage 4 and up
@@ -2320,8 +2299,9 @@ class MaskRCNN():
         # Callbacks
         callbacks = [
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
-                                        histogram_freq=0, write_graph=True, write_images=False),
+                                        histogram_freq=0, write_graph=False, write_images=False),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
+                                            save_best_only=True,
                                             verbose=0, save_weights_only=True),
         ]
 
@@ -2348,8 +2328,9 @@ class MaskRCNN():
             validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
-            workers=workers,
-            use_multiprocessing=True,
+            workers=1,
+            use_multiprocessing=False,
+            verbose=2
         )
         self.epoch = max(self.epoch, epochs)
 
@@ -2453,7 +2434,7 @@ class MaskRCNN():
             full_mask = utils.unmold_mask(masks[i], boxes[i], original_image_shape)
             full_masks.append(full_mask)
         full_masks = np.stack(full_masks, axis=-1)\
-            if full_masks else np.empty(original_image_shape[:2] + (0,))
+            if full_masks else np.empty(masks.shape[1:3] + (0,))
 
         return boxes, class_ids, scores, full_masks
 

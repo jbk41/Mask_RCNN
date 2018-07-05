@@ -1,0 +1,307 @@
+[+] Loading CUDA Toolkit  9.0.176  ... 
+[+] Loading cuDNN 7.0  libraries... 
+2018-06-29 11:44:03.611612: I tensorflow/core/platform/cpu_feature_guard.cc:140] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-06-29 11:44:04.406204: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1356] Found device 0 with properties: 
+name: Tesla V100-PCIE-16GB major: 7 minor: 0 memoryClockRate(GHz): 1.38
+pciBusID: 0000:0d:00.0
+totalMemory: 15.77GiB freeMemory: 15.35GiB
+2018-06-29 11:44:04.406316: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1435] Adding visible gpu devices: 0
+2018-06-29 11:44:07.803486: I tensorflow/core/common_runtime/gpu/gpu_device.cc:923] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-06-29 11:44:07.803581: I tensorflow/core/common_runtime/gpu/gpu_device.cc:929]      0 
+2018-06-29 11:44:07.803614: I tensorflow/core/common_runtime/gpu/gpu_device.cc:942] 0:   N 
+2018-06-29 11:44:07.857592: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1053] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 14866 MB memory) -> physical GPU (device: 0, name: Tesla V100-PCIE-16GB, pci bus id: 0000:0d:00.0, compute capability: 7.0)
+Using TensorFlow backend.
+/data/kimjb/conda/envs/mask_rcnn/lib/python3.4/site-packages/tensorflow/python/ops/gradients_impl.py:100: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
+  "Converting sparse IndexedSlices to a dense Tensor of unknown shape. "
+/data/kimjb/conda/envs/mask_rcnn/lib/python3.4/site-packages/skimage/transform/_warps.py:110: UserWarning: Anti-aliasing will be enabled by default in skimage 0.15 to avoid aliasing artifacts when down-sampling images.
+  warn("Anti-aliasing will be enabled by default in skimage 0.15 to "
+
+Configurations:
+BACKBONE                       resnet101
+BACKBONE_STRIDES               [4, 8, 16, 32, 64]
+BATCH_SIZE                     1
+BBOX_STD_DEV                   [0.1 0.1 0.2 0.2]
+DETECTION_MAX_INSTANCES        100
+DETECTION_MIN_CONFIDENCE       0.7
+DETECTION_NMS_THRESHOLD        0.3
+GPU_COUNT                      1
+GRADIENT_CLIP_NORM             5.0
+IMAGES_PER_GPU                 1
+IMAGE_MAX_DIM                  1024
+IMAGE_META_SIZE                14
+IMAGE_MIN_DIM                  256
+IMAGE_MIN_SCALE                0
+IMAGE_RESIZE_MODE              square
+IMAGE_SHAPE                    [1024 1024    3]
+LEARNING_MOMENTUM              0.9
+LEARNING_RATE                  0.0001
+LOSS_WEIGHTS                   {'mrcnn_mask_loss': 1.0, 'rpn_bbox_loss': 1.0, 'rpn_class_loss': 1.0, 'mrcnn_bbox_loss': 1.0, 'mrcnn_class_loss': 1.0}
+MASK_POOL_SIZE                 14
+MASK_SHAPE                     [28, 28]
+MAX_GT_INSTANCES               100
+MEAN_PIXEL                     [123.7 116.8 103.9]
+MINI_MASK_SHAPE                (56, 56)
+NAME                           cells
+NUM_CLASSES                    2
+POOL_SIZE                      7
+POST_NMS_ROIS_INFERENCE        1000
+POST_NMS_ROIS_TRAINING         2000
+ROI_POSITIVE_RATIO             0.33
+RPN_ANCHOR_RATIOS              [0.5, 1, 2]
+RPN_ANCHOR_SCALES              (8, 16, 32, 64, 128)
+RPN_ANCHOR_STRIDE              1
+RPN_BBOX_STD_DEV               [0.1 0.1 0.2 0.2]
+RPN_NMS_THRESHOLD              0.7
+RPN_TRAIN_ANCHORS_PER_IMAGE    256
+STEPS_PER_EPOCH                100
+TRAIN_BN                       False
+TRAIN_ROIS_PER_IMAGE           32
+USE_MINI_MASK                  True
+USE_RPN_ROIS                   True
+VALIDATION_STEPS               5
+WEIGHT_DECAY                   0.0001
+
+
+
+Starting at epoch 100. LR=1e-05
+
+Checkpoint Path: /data/kimjb/Mask_RCNN/logs/cells20180628T1527/mask_rcnn_cells_{epoch:04d}.h5
+Selecting layers to train
+conv1                  (Conv2D)
+bn_conv1               (BatchNorm)
+res2a_branch2a         (Conv2D)
+bn2a_branch2a          (BatchNorm)
+res2a_branch2b         (Conv2D)
+bn2a_branch2b          (BatchNorm)
+res2a_branch2c         (Conv2D)
+res2a_branch1          (Conv2D)
+bn2a_branch2c          (BatchNorm)
+bn2a_branch1           (BatchNorm)
+res2b_branch2a         (Conv2D)
+bn2b_branch2a          (BatchNorm)
+res2b_branch2b         (Conv2D)
+bn2b_branch2b          (BatchNorm)
+res2b_branch2c         (Conv2D)
+bn2b_branch2c          (BatchNorm)
+res2c_branch2a         (Conv2D)
+bn2c_branch2a          (BatchNorm)
+res2c_branch2b         (Conv2D)
+bn2c_branch2b          (BatchNorm)
+res2c_branch2c         (Conv2D)
+bn2c_branch2c          (BatchNorm)
+res3a_branch2a         (Conv2D)
+bn3a_branch2a          (BatchNorm)
+res3a_branch2b         (Conv2D)
+bn3a_branch2b          (BatchNorm)
+res3a_branch2c         (Conv2D)
+res3a_branch1          (Conv2D)
+bn3a_branch2c          (BatchNorm)
+bn3a_branch1           (BatchNorm)
+res3b_branch2a         (Conv2D)
+bn3b_branch2a          (BatchNorm)
+res3b_branch2b         (Conv2D)
+bn3b_branch2b          (BatchNorm)
+res3b_branch2c         (Conv2D)
+bn3b_branch2c          (BatchNorm)
+res3c_branch2a         (Conv2D)
+bn3c_branch2a          (BatchNorm)
+res3c_branch2b         (Conv2D)
+bn3c_branch2b          (BatchNorm)
+res3c_branch2c         (Conv2D)
+bn3c_branch2c          (BatchNorm)
+res3d_branch2a         (Conv2D)
+bn3d_branch2a          (BatchNorm)
+res3d_branch2b         (Conv2D)
+bn3d_branch2b          (BatchNorm)
+res3d_branch2c         (Conv2D)
+bn3d_branch2c          (BatchNorm)
+res4a_branch2a         (Conv2D)
+bn4a_branch2a          (BatchNorm)
+res4a_branch2b         (Conv2D)
+bn4a_branch2b          (BatchNorm)
+res4a_branch2c         (Conv2D)
+res4a_branch1          (Conv2D)
+bn4a_branch2c          (BatchNorm)
+bn4a_branch1           (BatchNorm)
+res4b_branch2a         (Conv2D)
+bn4b_branch2a          (BatchNorm)
+res4b_branch2b         (Conv2D)
+bn4b_branch2b          (BatchNorm)
+res4b_branch2c         (Conv2D)
+bn4b_branch2c          (BatchNorm)
+res4c_branch2a         (Conv2D)
+bn4c_branch2a          (BatchNorm)
+res4c_branch2b         (Conv2D)
+bn4c_branch2b          (BatchNorm)
+res4c_branch2c         (Conv2D)
+bn4c_branch2c          (BatchNorm)
+res4d_branch2a         (Conv2D)
+bn4d_branch2a          (BatchNorm)
+res4d_branch2b         (Conv2D)
+bn4d_branch2b          (BatchNorm)
+res4d_branch2c         (Conv2D)
+bn4d_branch2c          (BatchNorm)
+res4e_branch2a         (Conv2D)
+bn4e_branch2a          (BatchNorm)
+res4e_branch2b         (Conv2D)
+bn4e_branch2b          (BatchNorm)
+res4e_branch2c         (Conv2D)
+bn4e_branch2c          (BatchNorm)
+res4f_branch2a         (Conv2D)
+bn4f_branch2a          (BatchNorm)
+res4f_branch2b         (Conv2D)
+bn4f_branch2b          (BatchNorm)
+res4f_branch2c         (Conv2D)
+bn4f_branch2c          (BatchNorm)
+res4g_branch2a         (Conv2D)
+bn4g_branch2a          (BatchNorm)
+res4g_branch2b         (Conv2D)
+bn4g_branch2b          (BatchNorm)
+res4g_branch2c         (Conv2D)
+bn4g_branch2c          (BatchNorm)
+res4h_branch2a         (Conv2D)
+bn4h_branch2a          (BatchNorm)
+res4h_branch2b         (Conv2D)
+bn4h_branch2b          (BatchNorm)
+res4h_branch2c         (Conv2D)
+bn4h_branch2c          (BatchNorm)
+res4i_branch2a         (Conv2D)
+bn4i_branch2a          (BatchNorm)
+res4i_branch2b         (Conv2D)
+bn4i_branch2b          (BatchNorm)
+res4i_branch2c         (Conv2D)
+bn4i_branch2c          (BatchNorm)
+res4j_branch2a         (Conv2D)
+bn4j_branch2a          (BatchNorm)
+res4j_branch2b         (Conv2D)
+bn4j_branch2b          (BatchNorm)
+res4j_branch2c         (Conv2D)
+bn4j_branch2c          (BatchNorm)
+res4k_branch2a         (Conv2D)
+bn4k_branch2a          (BatchNorm)
+res4k_branch2b         (Conv2D)
+bn4k_branch2b          (BatchNorm)
+res4k_branch2c         (Conv2D)
+bn4k_branch2c          (BatchNorm)
+res4l_branch2a         (Conv2D)
+bn4l_branch2a          (BatchNorm)
+res4l_branch2b         (Conv2D)
+bn4l_branch2b          (BatchNorm)
+res4l_branch2c         (Conv2D)
+bn4l_branch2c          (BatchNorm)
+res4m_branch2a         (Conv2D)
+bn4m_branch2a          (BatchNorm)
+res4m_branch2b         (Conv2D)
+bn4m_branch2b          (BatchNorm)
+res4m_branch2c         (Conv2D)
+bn4m_branch2c          (BatchNorm)
+res4n_branch2a         (Conv2D)
+bn4n_branch2a          (BatchNorm)
+res4n_branch2b         (Conv2D)
+bn4n_branch2b          (BatchNorm)
+res4n_branch2c         (Conv2D)
+bn4n_branch2c          (BatchNorm)
+res4o_branch2a         (Conv2D)
+bn4o_branch2a          (BatchNorm)
+res4o_branch2b         (Conv2D)
+bn4o_branch2b          (BatchNorm)
+res4o_branch2c         (Conv2D)
+bn4o_branch2c          (BatchNorm)
+res4p_branch2a         (Conv2D)
+bn4p_branch2a          (BatchNorm)
+res4p_branch2b         (Conv2D)
+bn4p_branch2b          (BatchNorm)
+res4p_branch2c         (Conv2D)
+bn4p_branch2c          (BatchNorm)
+res4q_branch2a         (Conv2D)
+bn4q_branch2a          (BatchNorm)
+res4q_branch2b         (Conv2D)
+bn4q_branch2b          (BatchNorm)
+res4q_branch2c         (Conv2D)
+bn4q_branch2c          (BatchNorm)
+res4r_branch2a         (Conv2D)
+bn4r_branch2a          (BatchNorm)
+res4r_branch2b         (Conv2D)
+bn4r_branch2b          (BatchNorm)
+res4r_branch2c         (Conv2D)
+bn4r_branch2c          (BatchNorm)
+res4s_branch2a         (Conv2D)
+bn4s_branch2a          (BatchNorm)
+res4s_branch2b         (Conv2D)
+bn4s_branch2b          (BatchNorm)
+res4s_branch2c         (Conv2D)
+bn4s_branch2c          (BatchNorm)
+res4t_branch2a         (Conv2D)
+bn4t_branch2a          (BatchNorm)
+res4t_branch2b         (Conv2D)
+bn4t_branch2b          (BatchNorm)
+res4t_branch2c         (Conv2D)
+bn4t_branch2c          (BatchNorm)
+res4u_branch2a         (Conv2D)
+bn4u_branch2a          (BatchNorm)
+res4u_branch2b         (Conv2D)
+bn4u_branch2b          (BatchNorm)
+res4u_branch2c         (Conv2D)
+bn4u_branch2c          (BatchNorm)
+res4v_branch2a         (Conv2D)
+bn4v_branch2a          (BatchNorm)
+res4v_branch2b         (Conv2D)
+bn4v_branch2b          (BatchNorm)
+res4v_branch2c         (Conv2D)
+bn4v_branch2c          (BatchNorm)
+res4w_branch2a         (Conv2D)
+bn4w_branch2a          (BatchNorm)
+res4w_branch2b         (Conv2D)
+bn4w_branch2b          (BatchNorm)
+res4w_branch2c         (Conv2D)
+bn4w_branch2c          (BatchNorm)
+res5a_branch2a         (Conv2D)
+bn5a_branch2a          (BatchNorm)
+res5a_branch2b         (Conv2D)
+bn5a_branch2b          (BatchNorm)
+res5a_branch2c         (Conv2D)
+res5a_branch1          (Conv2D)
+bn5a_branch2c          (BatchNorm)
+bn5a_branch1           (BatchNorm)
+res5b_branch2a         (Conv2D)
+bn5b_branch2a          (BatchNorm)
+res5b_branch2b         (Conv2D)
+bn5b_branch2b          (BatchNorm)
+res5b_branch2c         (Conv2D)
+bn5b_branch2c          (BatchNorm)
+res5c_branch2a         (Conv2D)
+bn5c_branch2a          (BatchNorm)
+res5c_branch2b         (Conv2D)
+bn5c_branch2b          (BatchNorm)
+res5c_branch2c         (Conv2D)
+bn5c_branch2c          (BatchNorm)
+fpn_c5p5               (Conv2D)
+fpn_c4p4               (Conv2D)
+fpn_c3p3               (Conv2D)
+fpn_c2p2               (Conv2D)
+fpn_p5                 (Conv2D)
+fpn_p2                 (Conv2D)
+fpn_p3                 (Conv2D)
+fpn_p4                 (Conv2D)
+In model:  rpn_model
+    rpn_conv_shared        (Conv2D)
+    rpn_class_raw          (Conv2D)
+    rpn_bbox_pred          (Conv2D)
+mrcnn_mask_conv1       (TimeDistributed)
+mrcnn_mask_bn1         (TimeDistributed)
+mrcnn_mask_conv2       (TimeDistributed)
+mrcnn_mask_bn2         (TimeDistributed)
+mrcnn_class_conv1      (TimeDistributed)
+mrcnn_class_bn1        (TimeDistributed)
+mrcnn_mask_conv3       (TimeDistributed)
+mrcnn_mask_bn3         (TimeDistributed)
+mrcnn_class_conv2      (TimeDistributed)
+mrcnn_class_bn2        (TimeDistributed)
+mrcnn_mask_conv4       (TimeDistributed)
+mrcnn_mask_bn4         (TimeDistributed)
+mrcnn_bbox_fc          (TimeDistributed)
+mrcnn_mask_deconv      (TimeDistributed)
+mrcnn_class_logits     (TimeDistributed)
+mrcnn_mask             (TimeDistributed)
+
+ DONE TRAINING ALL LAYERS

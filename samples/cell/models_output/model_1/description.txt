@@ -1,0 +1,70 @@
+sbatch --partition=gpu --ntasks=8 --ntasks-per-core=1  --gres=gpu:p100:1 --mem=64g run_cells.sh
+
+mAP =  0.9472145915056907
+random_test_images = 15
+model_dir = /gpfs/gsfs10/users/kimjb/Mask_RCNN/logs/cells20180626T1146/mask_rcnn_cells_0100.h5
+
+initialized using coco
+
+SEaug = iaa.Sequential( [
+    iaa.Sharpen(alpha=(0.0, 1.0), lightness=(0.75, 2.0)),
+    iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5))
+], random_order=True)
+
+# Gaussian Noise
+GNaug = iaa.AdditiveGaussianNoise(scale=(0, 0.05*255))
+
+# Color
+Caug = iaa.Sequential([
+    iaa.WithChannels(0, iaa.Add((10, 100))),
+    iaa.WithChannels(1, iaa.Add((10, 100))),
+    iaa.WithChannels(2, iaa.Add((10, 100)))
+])
+
+# Blur
+Baug = iaa.Sequential([
+    iaa.GaussianBlur(sigma=(0.0, 3.0)),
+    iaa.AverageBlur(k=(2, 5)),
+    iaa.MedianBlur(k=(3, 7))
+], random_order=True)
+
+# Brightness and Contrast
+BCaug = iaa.Sequential([
+    iaa.ContrastNormalization((0.5, 1.5)),
+    iaa.Multiply((0.5, 1.5))
+], random_order=True)
+
+# Flips
+Faug = iaa.Sequential( [
+    iaa.Fliplr(.5),
+    iaa.Flipud(.5),
+])
+
+augmentation = iaa.Sometimes(.5, [
+        SEaug,
+        GNaug,
+        Caug,
+        Baug,
+        BCaug,
+        Faug
+    ])
+# Create model in training mode
+model = modellib.MaskRCNN(mode="training", config=config,
+                          model_dir=MODEL_DIR)
+
+
+# Which weights to start with?
+init_with = "coco"  # imagenet, coco, or last
+
+DEVICE = '/device:GPU:0'
+    with tf.device(DEVICE): 
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE,
+                    augmentation=augmentation, 
+                    epochs=100,
+                    layers='heads')
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 10,
+                    augmentation=augmentation,
+                    epochs=20, 
+                    layers="all")
