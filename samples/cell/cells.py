@@ -1,30 +1,14 @@
-
-# coding: utf-8
-
-# In[1]:
-
-
 import tensorflow as tf
-
-
-# In[2]:
-
-
 import os
 import sys
 import math
 import random
 import numpy as np
 import cv2
-#import Mask
 import skimage.io
-#from IPython.display import Image
 from PIL import Image
 from imgaug import augmenters as iaa
 import matplotlib.pyplot as plt
-
-
-
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -37,9 +21,6 @@ import mrcnn.model as modellib
 from mrcnn import visualize
 from mrcnn.model import log
 from mrcnn.visualize import display_images
-
-
-# get_ipython().run_line_magic('matplotlib', 'inline')
 
 # Directory to save logs and trained model
 # MODEL_DIR = os.path.join(ROOT_DIR, "logs")
@@ -71,7 +52,7 @@ class CellsConfig(Config):
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  # anchor side in pixels
     #TRAIN_ROIS_PER_IMAGE = 512
     TRAIN_ROIS_PER_IMAGE = 200
-    STEPS_PER_EPOCH = 1000
+    STEPS_PER_EPOCH = 100
     VALIDATION_STEPS = 50
     
     LEARNING_RATE = 1e-4 
@@ -118,9 +99,11 @@ class CellsDataset(utils.Dataset):
         """
         # Load image
         image = skimage.io.imread(self.image_info[image_id]['path'])
+
         # If 16bit, convert to 8bit
-        if image.dtype=='uint16': 
-            image = self.map_uint16_to_uint8(image, lower_bound=None, upper_bound=None)
+        # if image.dtype=='uint16': 
+        #    image = self.map_uint16_to_uint8(image, lower_bound=None, upper_bound=None)
+
         # If grayscale. Convert to RGB for consistency.
         if image.ndim != 3:
             image = skimage.color.gray2rgb(image)

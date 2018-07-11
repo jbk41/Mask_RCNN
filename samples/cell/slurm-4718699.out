@@ -102,3 +102,4 @@ Epoch 1/100
  - 2514s - loss: 1.1973 - rpn_class_loss: 0.0568 - rpn_bbox_loss: 0.7566 - mrcnn_class_loss: 0.0369 - mrcnn_bbox_loss: 0.1866 - mrcnn_mask_loss: 0.1606 - val_loss: 0.7892 - val_rpn_class_loss: 0.0197 - val_rpn_bbox_loss: 0.6068 - val_mrcnn_class_loss: 0.0224 - val_mrcnn_bbox_loss: 0.0710 - val_mrcnn_mask_loss: 0.0693
 Epoch 2/100
  - 2498s - loss: 0.8365 - rpn_class_loss: 0.0190 - rpn_bbox_loss: 0.5717 - mrcnn_class_loss: 0.0317 - mrcnn_bbox_loss: 0.0998 - mrcnn_mask_loss: 0.1144 - val_loss: 0.7064 - val_rpn_class_loss: 0.0124 - val_rpn_bbox_loss: 0.5362 - val_mrcnn_class_loss: 0.0276 - val_mrcnn_bbox_loss: 0.0612 - val_mrcnn_mask_loss: 0.0690
+slurmstepd: error: *** JOB 4718699 ON cn4182 CANCELLED AT 2018-07-05T13:49:39 DUE TO TIME LIMIT ***
