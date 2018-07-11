@@ -210,3 +210,14 @@ Epoch 56/100
  - 109s - loss: 0.7177 - rpn_class_loss: 0.0133 - rpn_bbox_loss: 0.4680 - mrcnn_class_loss: 0.0457 - mrcnn_bbox_loss: 0.0804 - mrcnn_mask_loss: 0.1102 - val_loss: 0.6235 - val_rpn_class_loss: 0.0087 - val_rpn_bbox_loss: 0.4539 - val_mrcnn_class_loss: 0.0386 - val_mrcnn_bbox_loss: 0.0527 - val_mrcnn_mask_loss: 0.0696
 Epoch 57/100
  - 111s - loss: 0.7404 - rpn_class_loss: 0.0122 - rpn_bbox_loss: 0.4750 - mrcnn_class_loss: 0.0474 - mrcnn_bbox_loss: 0.0877 - mrcnn_mask_loss: 0.1181 - val_loss: 0.6399 - val_rpn_class_loss: 0.0092 - val_rpn_bbox_loss: 0.4693 - val_mrcnn_class_loss: 0.0383 - val_mrcnn_bbox_loss: 0.0557 - val_mrcnn_mask_loss: 0.0674
+Epoch 58/100
+ - 108s - loss: 0.7204 - rpn_class_loss: 0.0128 - rpn_bbox_loss: 0.4603 - mrcnn_class_loss: 0.0467 - mrcnn_bbox_loss: 0.0837 - mrcnn_mask_loss: 0.1169 - val_loss: 0.6307 - val_rpn_class_loss: 0.0097 - val_rpn_bbox_loss: 0.4604 - val_mrcnn_class_loss: 0.0370 - val_mrcnn_bbox_loss: 0.0539 - val_mrcnn_mask_loss: 0.0695
+Epoch 59/100
+ - 109s - loss: 0.6968 - rpn_class_loss: 0.0124 - rpn_bbox_loss: 0.4598 - mrcnn_class_loss: 0.0428 - mrcnn_bbox_loss: 0.0762 - mrcnn_mask_loss: 0.1056 - val_loss: 0.6358 - val_rpn_class_loss: 0.0099 - val_rpn_bbox_loss: 0.4675 - val_mrcnn_class_loss: 0.0402 - val_mrcnn_bbox_loss: 0.0501 - val_mrcnn_mask_loss: 0.0680
+Epoch 60/100
+ - 108s - loss: 0.7211 - rpn_class_loss: 0.0128 - rpn_bbox_loss: 0.4599 - mrcnn_class_loss: 0.0467 - mrcnn_bbox_loss: 0.0867 - mrcnn_mask_loss: 0.1151 - val_loss: 0.6358 - val_rpn_class_loss: 0.0089 - val_rpn_bbox_loss: 0.4491 - val_mrcnn_class_loss: 0.0445 - val_mrcnn_bbox_loss: 0.0645 - val_mrcnn_mask_loss: 0.0688
+Epoch 61/100
+ - 111s - loss: 0.7206 - rpn_class_loss: 0.0127 - rpn_bbox_loss: 0.4572 - mrcnn_class_loss: 0.0494 - mrcnn_bbox_loss: 0.0854 - mrcnn_mask_loss: 0.1159 - val_loss: 0.6322 - val_rpn_class_loss: 0.0093 - val_rpn_bbox_loss: 0.4611 - val_mrcnn_class_loss: 0.0428 - val_mrcnn_bbox_loss: 0.0505 - val_mrcnn_mask_loss: 0.0685
+Epoch 62/100
+ - 109s - loss: 0.7236 - rpn_class_loss: 0.0120 - rpn_bbox_loss: 0.4661 - mrcnn_class_loss: 0.0489 - mrcnn_bbox_loss: 0.0814 - mrcnn_mask_loss: 0.1152 - val_loss: 0.6298 - val_rpn_class_loss: 0.0090 - val_rpn_bbox_loss: 0.4572 - val_mrcnn_class_loss: 0.0403 - val_mrcnn_bbox_loss: 0.0550 - val_mrcnn_mask_loss: 0.0683
+slurmstepd: error: *** JOB 5016043 ON cn2387 CANCELLED AT 2018-07-11T10:58:36 DUE TO TIME LIMIT ***

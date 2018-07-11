@@ -9,8 +9,6 @@ import shutil
 
 ### Basic tools
 
-
-
 def generate_masks(mask_array):
     """
     Generate a dictionary of masks. The keys are instance numbers from the numpy stack and the values are the corresponding binary masks.
@@ -48,4 +46,68 @@ def reset(train_directory, test_directory, image_dir)
         os.rmdir(train_directory)
         os.rmdir(test_directory)
         print('Done. All training and testing data merged to ' + image_dir)
+
+
+def train_test_split(train_directory, test_directory, image_dir):
+    makedir(train_directory)
+    makedir(test_directory)
+
+    list_of_directories = []
+    filenames= os.listdir(image_dir)
+    for filename in filenames: # loop through all the files and folders
+        if os.path.isdir(os.path.join(image_dir, filename)) and (filename != 'training_data' and filename != 'testing_data'): # check whether the current object is a folder or not
+            list_of_directories.append(filename)
+    """for directory in os.walk(image_dir)[1]:
+        if directory != 'training_data' or directory != 'testing_data':
+            list_of_directories.append(directory)
+    """ 
+    num_images = len(list_of_directories)
+    num_train = int(num_images*TRAIN)
+    num_test = num_images - num_train
+
+    random.shuffle(list_of_directories)
+    for i in range(num_train):
+        destination = os.path.join(train_directory, list_of_directories[i])
+        shutil.move(os.path.join(image_dir, list_of_directories[i]), destination)
+    for i in range(num_train, num_images):
+        destination = os.path.join(test_directory, list_of_directories[i])
+        shutil.move(os.path.join(image_dir, list_of_directories[i]), destination)
+
+    # print('Done. Completed a train/test split of the data in ' + image_dir + '. There were ' + num_train + ' training images and ' + num_test + ' testing images.')
+    print('Done. Completed a train/test split of the data in {image_dir}. There were {num_train} training images and {num_test} testing images.'.format(image_dir=image_dir, num_train=str(num_train), num_test=str(num_test)))
+
+
+
+def np_to_image(image_file, mask_file):
+    image_stack_array = np.load(image_file) # loads .npy file that contains images
+    mask_stack_array = np.load(mask_file) # loads .npy file that contains GT masks
+    
+    num_images = image_stack_array.shape[0]
+    num_masks = mask_stack_array.shape[0]
+    assert num_images==num_masks, 'number of images must equal number of mask images'
+
+    for i in range(num_images):
+        image_array = image_stack_array[i]
+        mask_array = mask_stack_array[i]
+
+        image_name = os.path.join(image_dir, sha224(image_array.tostring()).hexdigest()) # give unique name to each set of images/masks
+        # make directory for each set and then image and masks subdirectories
+         
+        makedir(image_name)
+        image_instance_dir = os.path.join(image_name, 'image')
+        mask_instance_dir = os.path.join(image_name, 'masks')
+
+        makedir(image_instance_dir)
+        makedir(mask_instance_dir)
+        
+        scipy.misc.imsave(os.path.join(image_instance_dir, 'image.tif'), image_array)
+
+        masks = generate_masks(mask_array)
+        count = 0
+        for index in masks:
+            instance_file_name = 'mask_instance_' + '{:02d}'.format(count) + '.tif' # zero pad for naming
+            instance_array = masks[index]
+            scipy.misc.imsave(os.path.join(mask_instance_dir, instance_file_name),instance_array)
+            count += 1
+    print('Done. Converted numpy array to dataset.')
 

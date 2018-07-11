@@ -1,14 +1,11 @@
 import tensorflow as tf
 import os
 import sys
-import math
 import random
 import numpy as np
 import cv2
 import skimage.io
-from PIL import Image
-from imgaug import augmenters as iaa
-import matplotlib.pyplot as plt
+import warnings; warnings.simplefilter('ignore')
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -18,9 +15,7 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
 from mrcnn import utils
 import mrcnn.model as modellib
-from mrcnn import visualize
 from mrcnn.model import log
-from mrcnn.visualize import display_images
 
 
 ####################################################################
@@ -118,3 +113,60 @@ class CellsDataset(utils.Dataset):
         # one class ID, we return an array of ones
         return mask, np.ones([mask.shape[-1]], dtype=np.int32) 
  
+
+
+####################################################################
+# DATASET 
+####################################################################
+
+def train(dataset_dir, augmentation=None, init_with='coco'):
+    dataset_train = CellsDataset()
+    dataset_train.load_cells(dataset_dir, subset="train")
+    dataset_train.prepare()
+
+    dataset_test = CellsDataset()
+    dataset_test.load_cells(dataset_dir, subset="test")
+    dataset_test.prepare()
+
+    model = modellib.MaskRCNN(mode="training", config=config,
+                              model_dir=MODEL_DIR)
+
+    # Which weights to start with?
+    # imagenet, coco, or last
+    print('initializing with {}'.format(init_with))
+    if init_with == "imagenet":
+        model.load_weights(model.get_imagenet_weights(), by_name=True)
+    elif init_with == "coco":
+        # Load weights trained on MS COCO, but skip layers that
+        # are different due to the different number of classes
+        # See README for instructions to download the COCO weights
+        print('before load weights')
+        model.load_weights(COCO_MODEL_PATH, by_name=True,
+                           exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
+                                    "mrcnn_bbox", "mrcnn_mask"])
+        print('after load weights')
+    elif init_with == "last":
+        # Load the last model you trained and continue training
+        model.load_weights(model.find_last()[1], by_name=True)
+    
+    DEVICE = '/device:GPU:0'
+    with tf.device(DEVICE): 
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE,
+                    augmentation=augmentation, 
+                    epochs=100,
+                    layers='heads')
+
+        print('\n DONE TRAINING HEADS')
+        # Fine tune all layers
+        # Passing layers="all" trains all layers. You can also 
+        # pass a regular expression to select which layers to
+        # train by name pattern.
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 10,
+                    augmentation=augmentation,
+                    epochs=100, 
+                    layers="all")
+        print('\n DONE TRAINING ALL LAYERS')
+
+
