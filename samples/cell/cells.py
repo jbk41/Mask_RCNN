@@ -9,6 +9,7 @@ import skimage.io
 from PIL import Image
 from imgaug import augmenters as iaa
 import matplotlib.pyplot as plt
+import time
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -45,7 +46,7 @@ class CellsConfig(Config):
     NUM_CLASSES = 1+1 # background + cell
     
     # size of images are 256px X 256px
-    IMAGE_MIN_DIM = 256
+    IMAGE_MIN_DIM = 1024 
     IMAGE_MAX_DIM = 1024 
     
      # Use smaller anchors because our image and objects are small
@@ -259,23 +260,49 @@ if __name__ == '__main__':
     
     DEVICE = '/device:GPU:0'
     with tf.device(DEVICE): 
+        train_heads_start = time.time() 
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE,
                     augmentation=augmentation, 
-                    epochs=100,
+                    epochs=60,
                     layers='heads')
-
-        print('\n DONE TRAINING HEADS')
+      
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 10,
+                    augmentation=augmentation, 
+                    epochs=25,
+                    layers='heads')
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 100,
+                    augmentation=augmentation, 
+                    epochs=25,
+                    layers='heads')
+        train_heads_end = time.time()
+        train_heads_time = train_head_end - train_heads_start
+        print('\n Done training heads. Took {} seconds'.format(train_heads_time))
         # Fine tune all layers
         # Passing layers="all" trains all layers. You can also 
         # pass a regular expression to select which layers to
         # train by name pattern.
+        train_all_start = time.time() 
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 10,
                     augmentation=augmentation,
-                    epochs=100, 
+                    epochs=50, 
                     layers="all")
-        print('\n DONE TRAINING ALL LAYERS')
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 100,
+                    augmentation=augmentation,
+                    epochs=25, 
+                    layers="all")
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 1000,
+                    augmentation=augmentation,
+                    epochs=25, 
+                    layers="all")
+        train_all_end = time.time() 
+        train_all_time = train_all_end - train_all_start
+        print('\n Done training all layers. Took {} seconds'.format(train_all_time))
 
     #model_path = os.path.join(MODEL_DIR, "cell_mask_rcnn.h5")
     #model.keras_model.save_weights(model_path)
