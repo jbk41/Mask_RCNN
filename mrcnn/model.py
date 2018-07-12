@@ -2238,10 +2238,10 @@ class MaskRCNN():
         # Path to save after each epoch. Include placeholders that get filled by Keras.
         self.checkpoint_path = os.path.join(self.log_dir, "mask_rcnn_{}*epoch*.h5".format(
             self.config.NAME.lower()))
-        #self.checkpoint_path = self.checkpoint_path.replace(
-        #    "*epoch*", "{epoch:04d}")
         self.checkpoint_path = self.checkpoint_path.replace(
-            "*epoch*", "")
+            "*epoch*", "{epoch:04d}")
+        # self.checkpoint_path = self.checkpoint_path.replace(
+        #    "*epoch*", "")
 
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
