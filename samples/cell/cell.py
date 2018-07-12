@@ -50,7 +50,26 @@ class CellsConfig(Config):
 class CellsDataset(utils.Dataset):
     """Generates a cells dataset for training. Dataset consists of microscope images.
 """
-        
+     def generate_masks(mask_array):
+        """
+        Generate a dictionary of masks. The keys are instance numbers from the numpy stack and the values are the corresponding binary masks.
+
+        Args:
+            mask_array: numpy array of size [H,W]. 0 represents the background. Any non zero integer represents a individual instance
+
+        Returns:
+            Mask dictionary {instance_id: [H,W] numpy binary mask array}
+        """
+        masks = {} # keys are instances, values are corresponding binary mask array
+        for (x,y), value in np.ndenumerate(mask_array): #go through entire array 
+            if value != 0: # if cell
+                if value not in masks: # if new instance introduced
+                    masks[value] = np.zeros(mask_array.shape) #make new array
+                dummy_array = masks[value]
+                dummy_array[(x,y)] = 1
+                masks[value] = dummy_array # change value of array to 1 to represent cell
+        return masks
+           
     def load_cells(self, dataset_dir, subset):
         """Loads cell images from the dataset directory"""
         
@@ -154,7 +173,7 @@ def train(dataset_dir, augmentation=None, init_with='coco'):
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE,
                     augmentation=augmentation, 
-                    epochs=100,
+                    epochs=10,
                     layers='heads')
 
         print('\n DONE TRAINING HEADS')
@@ -165,7 +184,7 @@ def train(dataset_dir, augmentation=None, init_with='coco'):
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 10,
                     augmentation=augmentation,
-                    epochs=100, 
+                    epochs=10, 
                     layers="all")
         print('\n DONE TRAINING ALL LAYERS')
 
