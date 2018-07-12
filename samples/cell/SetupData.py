@@ -6,6 +6,7 @@ import sys
 from hashlib import sha224
 import random
 import shutil
+from libtiff import TIFF
 
 ### Basic tools
 
@@ -35,6 +36,14 @@ def makedir(directory): # makes directory
 
 
 def reset(train_directory, test_directory, image_dir)
+    """ 
+    Move all images in the testing and training directory back into image_dir.
+
+    Args:
+        train_directory: /path/to/train/directory
+        test_directory: /path/to/test/directory
+        image_dir: /path/to/move/images/to
+    """
     if os.path.exists(train_directory):
         for filename in os.listdir(train_directory):
             shutil.move(os.path.join(train_directory, filename), image_dir)
@@ -49,6 +58,15 @@ def reset(train_directory, test_directory, image_dir)
 
 
 def train_test_split(train_directory, test_directory, image_dir):
+    """
+    Takes all images in image_dir and complete a train/test split
+
+    Args:
+        train_directory: /path/to/train/directory
+        test_directory: /path/to/test/directory
+        image_dir: /path/to/move/images/to
+
+    """
     makedir(train_directory)
     makedir(test_directory)
 
@@ -78,7 +96,9 @@ def train_test_split(train_directory, test_directory, image_dir):
 
 
 
-def np_to_image(image_file, mask_file):
+def np_to_image(image_file, mask_file, image_dir):
+    """
+    """
     image_stack_array = np.load(image_file) # loads .npy file that contains images
     mask_stack_array = np.load(mask_file) # loads .npy file that contains GT masks
     
@@ -107,7 +127,12 @@ def np_to_image(image_file, mask_file):
         for index in masks:
             instance_file_name = 'mask_instance_' + '{:02d}'.format(count) + '.tif' # zero pad for naming
             instance_array = masks[index]
-            scipy.misc.imsave(os.path.join(mask_instance_dir, instance_file_name),instance_array)
+            instance_file_path = os.path.join(mask_instance_dir, instance_file_name)
+
+            tiff = TIFF.open(instance_file_path, mode='w')
+            tiff.write_image(instance_array)
+            tiff.close()
+            # scipy.misc.imsave(os.path.join(mask_instance_dir, instance_file_name),instance_array)
             count += 1
     print('Done. Converted numpy array to dataset.')
 
