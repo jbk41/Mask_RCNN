@@ -278,7 +278,7 @@ if __name__ == '__main__':
                     epochs=25,
                     layers='heads')
         train_heads_end = time.time()
-        train_heads_time = train_head_end - train_heads_start
+        train_heads_time = train_heads_end - train_heads_start
         print('\n Done training heads. Took {} seconds'.format(train_heads_time))
         # Fine tune all layers
         # Passing layers="all" trains all layers. You can also 
