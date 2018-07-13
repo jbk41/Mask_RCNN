@@ -80,5 +80,6 @@ if __name__ == '__main__':
             sys.exit('{} is not a valid initialization weights path'.format(args.init))
         
     if args.command == 'train':
-        train(args.dataset, augmentation=augmentation, init_with=args.init)          
-        
+        train(args.dataset, augmentation=augmentation, init_with=args.init, model_dir=args.logs)          
+    else:
+        sys.exit('{} is not a valid command'.format(args.command)) 
