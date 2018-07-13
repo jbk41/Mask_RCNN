@@ -135,10 +135,12 @@ class CellsDataset(utils.Dataset):
 
 
 ####################################################################
-# DATASET 
+# TRAINING 
 ####################################################################
 
 def train(dataset_dir, augmentation=None, init_with='coco'):
+    MODEL_DIR = ('/data/kimjb/Mask_RCNN/logs')
+
     dataset_train = CellsDataset()
     dataset_train.load_cells(dataset_dir, subset="train")
     dataset_train.prepare()
@@ -150,6 +152,7 @@ def train(dataset_dir, augmentation=None, init_with='coco'):
     model = modellib.MaskRCNN(mode="training", config=config,
                               model_dir=MODEL_DIR)
 
+
     # Which weights to start with?
     # imagenet, coco, or last
     print('initializing with {}'.format(init_with))
@@ -159,11 +162,16 @@ def train(dataset_dir, augmentation=None, init_with='coco'):
         # Load weights trained on MS COCO, but skip layers that
         # are different due to the different number of classes
         # See README for instructions to download the COCO weights
-        print('before load weights')
+        # Local path to trained weights file
+        COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+        # Download COCO trained weights from Releases if needed
+        if not os.path.exists(COCO_MODEL_PATH):
+            utils.download_trained_weights(COCO_MODEL_PATH)
+
+
         model.load_weights(COCO_MODEL_PATH, by_name=True,
                            exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
                                     "mrcnn_bbox", "mrcnn_mask"])
-        print('after load weights')
     elif init_with == "last":
         # Load the last model you trained and continue training
         model.load_weights(model.find_last()[1], by_name=True)
