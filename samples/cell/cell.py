@@ -58,7 +58,7 @@ class CellsConfig(Config):
 class CellsDataset(utils.Dataset):
     """Generates a cells dataset for training. Dataset consists of microscope images.
 """
-     def generate_masks(mask_array):
+    def generate_masks(mask_array):
         """
         Generate a dictionary of masks. The keys are instance numbers from the numpy stack and the values are the corresponding binary masks.
 
@@ -191,21 +191,21 @@ def train(dataset_dir, augmentation=None, init_with='coco', model_dir=None):
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE,
                     augmentation=augmentation, 
-                    epochs=60,
+                    epochs=1,
                     layers='heads')
       
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 10,
                     augmentation=augmentation, 
-                    epochs=25,
+                    epochs=1,
                     layers='heads')
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 100,
                     augmentation=augmentation, 
-                    epochs=25,
+                    epochs=1,
                     layers='heads')
         train_heads_end = time.time()
-        train_heads_time = train_head_end - train_heads_start
+        train_heads_time = train_heads_end - train_heads_start
         print('\n Done training heads. Took {} seconds'.format(train_heads_time))
         # Fine tune all layers
         # Passing layers="all" trains all layers. You can also 
@@ -215,17 +215,17 @@ def train(dataset_dir, augmentation=None, init_with='coco', model_dir=None):
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 10,
                     augmentation=augmentation,
-                    epochs=50, 
+                    epochs=1, 
                     layers="all")
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 100,
                     augmentation=augmentation,
-                    epochs=25, 
+                    epochs=, 
                     layers="all")
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 1000,
                     augmentation=augmentation,
-                    epochs=25, 
+                    epochs=1, 
                     layers="all")
         train_all_end = time.time() 
         train_all_time = train_all_end - train_all_start
