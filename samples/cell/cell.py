@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 import skimage.io
 import warnings; warnings.simplefilter('ignore')
+import time
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -155,6 +156,9 @@ def train(dataset_dir, augmentation=None, init_with='coco', model_dir=None):
     dataset_test = CellsDataset()
     dataset_test.load_cells(dataset_dir, subset="test")
     dataset_test.prepare()
+    
+    config = CellsConfig()
+    config.display()
 
     model = modellib.MaskRCNN(mode="training", config=config,
                               model_dir=MODEL_DIR)
@@ -220,7 +224,7 @@ def train(dataset_dir, augmentation=None, init_with='coco', model_dir=None):
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 100,
                     augmentation=augmentation,
-                    epochs=, 
+                    epochs=1, 
                     layers="all")
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 1000,
