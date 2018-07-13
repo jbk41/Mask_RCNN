@@ -40,7 +40,6 @@ BBaug = iaa.Sequential([
     iaa.Multiply((.5, 3))
 ], random_order=True)
 
-# Edit the augmentation variable to add or exclude certain augmentations to include during training
 augmentation = iaa.Sometimes(.5, [
         SEaug,
         GNaug,
@@ -55,23 +54,31 @@ augmentation = iaa.Sometimes(.5, [
 
 if __name__ == '__main__':
     import argparse
+    import os
+    import sys
+
+    # Edit the augmentation variable to add or exclude certain augmentations to include during training
+
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Train Mask R-CNN to detect cells.')
     parser.add_argument("command",
                         metavar="<command>",
-                        help="'train model'")
+                        help="'train model, edit this file to modify augmentations used in training'")
     parser.add_argument('--dataset', required=True,
                         metavar="/path/to/cell/dataset/",
                         help='Directory of the Cell dataset')
-    parser.add_argument('--init-with', required=True,
-                        metavar="/path/to/weights.h5",
-                        help="coco, imagenet, last")
-    parser.add_argument('--logs', required=False,
-                        default=DEFAULT_LOGS_DIR,
+    parser.add_argument('--init', required=True,
+                        metavar="Weights to initialize training",
+                        help="coco, imagenet, last, or /path/to/weights")
+    parser.add_argument('--logs', required=True,
                         metavar="/path/to/logs/",
-                        help='Logs and checkpoints directory (default=logs/)')
-    parser.add_argument('--image', required=False,
-                        metavar="path or URL to image",
-                        help='Image to apply the color splash effect on')
+                        help='Logs and checkpoints directory')
     args = parser.parse_args()
 
+    if args.init not in ['coco', 'last', 'imagenet']:
+        if not os.path.exists(args.init):
+            sys.exit('{} is not a valid initialization weights path'.format(args.init))
+        
+    if args.command == 'train':
+        train(args.dataset, augmentation=augmentation, init_with=args.init)          
+        
