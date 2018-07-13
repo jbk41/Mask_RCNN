@@ -26,20 +26,28 @@ class CellsConfig(Config):
     NAME = "cells"
     
     GPU_COUNT = 1
+    
+    # To Reddy and George (TRAG), img/gpu could be increased to maximize training (i think I'm undersaturating the GPU so maybe we can increase this later)
     IMAGES_PER_GPU = 2
     
     NUM_CLASSES = 1+1 # background + cell
     
-    # size of images are 256px X 256px
+    # TRAG, change the following values based on the input size for training
     IMAGE_MIN_DIM = 256
     IMAGE_MAX_DIM = 1024 
-    
-     # Use smaller anchors because our image and objects are small
+
+    # TRAG, RPN_ANCHOR_SCALES can be decreased for smaller images. For example, the caltech images have very small cells so the following value can be decreased
+    # Use smaller anchors because our image and objects are small
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  # anchor side in pixels
+
     #TRAIN_ROIS_PER_IMAGE = 512
+    
     TRAIN_ROIS_PER_IMAGE = 200
+
+    # batch_size = num_training_data/STEPS_PER_EPOCH
     STEPS_PER_EPOCH = 100
     VALIDATION_STEPS = 50
+    
     
     LEARNING_RATE = 1e-4 
 
@@ -138,9 +146,8 @@ class CellsDataset(utils.Dataset):
 # TRAINING 
 ####################################################################
 
-def train(dataset_dir, augmentation=None, init_with='coco'):
-    MODEL_DIR = ('/data/kimjb/Mask_RCNN/logs')
-
+def train(dataset_dir, augmentation=None, init_with='coco', model_dir=None):
+    MODEL_DIR = model_dir
     dataset_train = CellsDataset()
     dataset_train.load_cells(dataset_dir, subset="train")
     dataset_train.prepare()
@@ -162,6 +169,7 @@ def train(dataset_dir, augmentation=None, init_with='coco'):
         # Load weights trained on MS COCO, but skip layers that
         # are different due to the different number of classes
         # See README for instructions to download the COCO weights
+
         # Local path to trained weights file
         COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
         # Download COCO trained weights from Releases if needed
@@ -175,25 +183,52 @@ def train(dataset_dir, augmentation=None, init_with='coco'):
     elif init_with == "last":
         # Load the last model you trained and continue training
         model.load_weights(model.find_last()[1], by_name=True)
-    
+
+    ### TRAIN THE MODEL
     DEVICE = '/device:GPU:0'
     with tf.device(DEVICE): 
+        train_heads_start = time.time() 
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE,
                     augmentation=augmentation, 
-                    epochs=10,
+                    epochs=60,
                     layers='heads')
-
-        print('\n DONE TRAINING HEADS')
+      
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 10,
+                    augmentation=augmentation, 
+                    epochs=25,
+                    layers='heads')
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 100,
+                    augmentation=augmentation, 
+                    epochs=25,
+                    layers='heads')
+        train_heads_end = time.time()
+        train_heads_time = train_head_end - train_heads_start
+        print('\n Done training heads. Took {} seconds'.format(train_heads_time))
         # Fine tune all layers
         # Passing layers="all" trains all layers. You can also 
         # pass a regular expression to select which layers to
         # train by name pattern.
+        train_all_start = time.time() 
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE / 10,
                     augmentation=augmentation,
-                    epochs=10, 
+                    epochs=50, 
                     layers="all")
-        print('\n DONE TRAINING ALL LAYERS')
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 100,
+                    augmentation=augmentation,
+                    epochs=25, 
+                    layers="all")
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 1000,
+                    augmentation=augmentation,
+                    epochs=25, 
+                    layers="all")
+        train_all_end = time.time() 
+        train_all_time = train_all_end - train_all_start
+        print('\n Done training all layers. Took {} seconds'.format(train_all_time))
 
 
