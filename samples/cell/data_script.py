@@ -4,6 +4,12 @@ from data import train_test_split
 from data import reset
 import os
 
+# example line
+# python data_script.py imgmask --outdir=/data/kimjb/Mask_RCNN/image_test/images --images=/data/kimjb/Mask_RCNN/image_test/image_01.npy --masks=/data/kimjb/Mask_RCNN/image_test/masks_01.npy
+
+# python data_script.py split --outdir=/data/kimjb/Mask_RCNN/image_test/images
+# python data_script.py reset --outdir=/data/kimjb/Mask_RCNN/image_test/images
+
 if __name__ == '__main__':
     import argparse
     # Parse command line arguments
@@ -21,7 +27,7 @@ if __name__ == '__main__':
                         metavar="/path/to/numpy/mask/file",
                         help='Path to numpy mask file')
     parser.add_argument('--train-percent', required=False,
-                        default=.7,
+                        default=.9,
                         metavar='train percentage as decimal value',
                         help='Percentage of data to allocate for training')
     args = parser.parse_args()
