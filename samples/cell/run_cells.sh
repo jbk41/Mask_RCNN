@@ -6,6 +6,6 @@ source /data/kimjb/conda/etc/profile.d/conda.sh
 conda activate mask_rcnn
 
 
-python cell_script.py train --dataset=/data/kimjb/Mask_RCNN/image_test/images --init=coco --logs=/data/kimjb/Mask_RCNN/logs 
+./cell_script.py train --dataset=/data/kimjb/Mask_RCNN/image_test/images --init=coco --logs=/data/kimjb/Mask_RCNN/logs 
 
 echo 'Done'
