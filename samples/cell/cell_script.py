@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 from cell import train
 from imgaug import augmenters as iaa
 
