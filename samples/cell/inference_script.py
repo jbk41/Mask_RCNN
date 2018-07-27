@@ -1,5 +1,7 @@
 from inference import stitched_inference
 from inference import CleanMask
+from inference import generate_inference_model
+from inference import preprocess
 from PIL import Image
 import numpy as np
 # example
@@ -28,13 +30,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     
-    image = Image.open(args.image)
-    imarray = np.array(image)
+    image = preprocess(args.image)
     padding = int(args.padding)
     cropsize = int(args.cropsize) 
-    stitched_masks = stitched_inference(imarray, args.model, cropsize, padding)
 
-    cleaned_masks = CleanMask(stitched_masks)
-    cleaned_masks.cleanup()
-    cleaned_masks.save(args.output)    
-    print('Done. Saved masks to {}.'.format(args.output)) 
+    model = generate_inference_model(args.model, 512)
+    import time
+    start = time.time()
+    stitched_inference_stack, num_times_visited = stitched_inference(image, cropsize, model, padding=padding)
+    masks = CleanMask(stitched_inference_stack, num_times_visited)
+    masks.cleanup()
+    masks.save(args.output)
+    end = time.time()
+    
+    print('Done. Saved masks to {}. Took {} seconds'.format(args.output, end-start)) 
