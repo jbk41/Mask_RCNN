@@ -112,8 +112,8 @@ class CellsDataset(utils.Dataset):
         image = skimage.io.imread(self.image_info[image_id]['path'])
 
         # If 16bit, convert to 8bit
-        # if image.dtype=='uint16': 
-        #    image = self.map_uint16_to_uint8(image, lower_bound=None, upper_bound=None)
+        if image.dtype=='uint16': 
+      	    image = self.map_uint16_to_uint8(image, lower_bound=None, upper_bound=None)
 
         # If grayscale. Convert to RGB for consistency.
         if image.ndim != 3:
@@ -122,6 +122,50 @@ class CellsDataset(utils.Dataset):
         if image.shape[-1] == 4:
             image = image[..., :3]
         return image
+
+    def map_uint16_to_uint8(self, img, lower_bound=None, upper_bound=None):
+        '''
+        Map a 16-bit image trough a lookup table to convert it to 8-bit.
+
+        Parameters
+        ----------
+        img: numpy.ndarray[np.uint16]
+            image that should be mapped
+        lower_bound: int, optional
+            lower bound of the range that should be mapped to ``[0, 255]``,
+            value must be in the range ``[0, 65535]`` and smaller than `upper_bound`
+            (defaults to ``numpy.min(img)``)
+        upper_bound: int, optional
+           upper bound of the range that should be mapped to ``[0, 255]``,
+           value must be in the range ``[0, 65535]`` and larger than `lower_bound`
+           (defaults to ``numpy.max(img)``)
+
+        Returns
+        -------
+        numpy.ndarray[uint8]
+        '''
+        
+        if lower_bound is None:
+            lower_bound = np.min(img)
+        if not(0 <= lower_bound < 2**16):
+            raise ValueError(
+                '"lower_bound" must be in the range [0, 65535]')
+        if upper_bound is None:
+            upper_bound = np.max(img)
+        if not(0 <= upper_bound < 2**16):
+            raise ValueError(
+                '"upper_bound" must be in the range [0, 65535]')    
+        if lower_bound >= upper_bound:
+            raise ValueError(
+                '"lower_bound" must be smaller than "upper_bound"')
+        lut = np.concatenate([
+            np.zeros(lower_bound, dtype=np.uint16),
+            np.linspace(0, 255, upper_bound - lower_bound).astype(np.uint16),
+            np.ones(2**16 - upper_bound, dtype=np.uint16) * 255
+        ])
+        return lut[img].astype(np.uint8)
+
+
     
     
     def load_mask(self, image_id):
@@ -201,58 +245,5 @@ def train(dataset_dir, augmentation=None, init_with='coco', model_dir=None):
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE,
                     augmentation=augmentation, 
-                    epochs=75,
+                    epochs=1,
                     layers='heads')
-
-        model.train(dataset_train, dataset_test, 
-                    learning_rate=config.LEARNING_RATE / 10,
-                    augmentation=augmentation, 
-                    epochs=100,
-                    layers='heads')
-
-        model.train(dataset_train, dataset_test, 
-                    learning_rate=config.LEARNING_RATE / 100,
-                    augmentation=augmentation, 
-                    epochs=125,
-                    layers='heads')
-        train_heads_end = time.time()
-        train_heads_time = train_heads_end - train_heads_start
-        print('\n Done training heads. Took {} seconds'.format(train_heads_time))
-
-        # Fine tune all layers
-        # Passing layers="all" trains all layers. You can also 
-        # pass a regular expression to select which layers to
-        # train by name pattern.
-        train_all_start = time.time() 
-
-        t1s = time.time()
-        model.train(dataset_train, dataset_test, 
-                    learning_rate=config.LEARNING_RATE / 10,
-                    #augmentation=augmentation,
-                    epochs=150, 
-                    layers="all")
-        t1e = time.time()
-        print(t1e-t1s)
-
-        t2s = time.time()
-        model.train(dataset_train, dataset_test, 
-                    learning_rate=config.LEARNING_RATE / 100,
-                    #augmentation=augmentation,
-                    epochs=175, 
-                    layers="all")
-        t2e = time.time()
-        print(t2e-t2s)
-
-        t3s = time.time()
-        model.train(dataset_train, dataset_test, 
-                    learning_rate=config.LEARNING_RATE / 1000,
-                    #augmentation=augmentation,
-                    epochs=200, 
-                    layers="all")
-        t3e = time.time()
-        print(t3e-t3s)        
-
-        train_all_end = time.time() 
-        train_all_time = train_all_end - train_all_start
-        print('\n Done training all layers. Took {} seconds'.format(train_all_time))
-
