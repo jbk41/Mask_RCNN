@@ -12,6 +12,7 @@ import os
 
 if __name__ == '__main__':
     import argparse
+    TRAIN_PERCENT = .9
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Generate data, train/test split, reset train/test splits')
     parser.add_argument("command",
@@ -26,10 +27,6 @@ if __name__ == '__main__':
     parser.add_argument('--masks', required=False,
                         metavar="/path/to/numpy/mask/file",
                         help='Path to numpy mask file')
-    parser.add_argument('--train-percent', required=False,
-                        default=.9,
-                        metavar='train percentage as decimal value',
-                        help='Percentage of data to allocate for training')
     args = parser.parse_args()
 
     
@@ -47,7 +44,7 @@ if __name__ == '__main__':
         np_to_img(args.images, args.outdir) 
     
     if args.command == 'split':
-        train_test_split(train_directory, test_directory, args.outdir, args.train_percent)
+        train_test_split(train_directory, test_directory, args.outdir, TRAIN_PERCENT)
 
     if args.command == 'reset':
         reset(train_directory, test_directory, args.outdir)
