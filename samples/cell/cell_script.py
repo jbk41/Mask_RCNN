@@ -4,6 +4,7 @@ from imgaug import augmenters as iaa
 ####################################################################
 # Augmentations 
 ####################################################################
+# TGAR, add your own augmentations using the iaa package
 # Sharpen and Emboss
 SEaug = iaa.Sequential( [
     iaa.Sharpen(alpha=(0.0, 1.0), lightness=(0.75, 2.0)),
@@ -40,13 +41,21 @@ BBaug = iaa.Sequential([
     iaa.Multiply((.5, 3))
 ], random_order=True)
 
+# transformations - helps with making overlapping cells
+Taug = iaa.Sequential( [
+    iaa.ElasticTransformation(alpha=(0, 5.0), sigma=0.25),
+    iaa.Superpixels(p_replace=0.5, n_segments=64),
+    iaa.PiecewiseAffine(scale=(0.01, 0.05))
+])
+
 augmentation = iaa.Sometimes(.5, [
         SEaug,
         GNaug,
         Caug,
         BBaug,
         BCaug,
-        Faug
+        Faug,
+        Taug
     ])
 
 

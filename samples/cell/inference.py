@@ -18,7 +18,9 @@ def generate_inference_model(model_path, cropsize):
         IMAGES_PER_GPU = 1
         # comment below if running inference on small crops
         TRAIN_ROIS_PER_IMAGE = 2000
+        # TGAR, change POST_NMS_ROIS_INFERENCE if you feel it is necessary. Higher ROIS means it will be easier to detect object when there are many instances. However, if there are too many ROIS and not many objects, many pseudo objects will be identified. I noticed that the some masks generated will take up the entire screen when ROIS is too high.
         POST_NMS_ROIS_INFERENCE = 10000
+        # Increase for caltech images, decrease for images with few cells
         DETECTION_MAX_INSTANCES = 200
         #DETECTION_NMS_THRESHOLD = 0.35
         IMAGE_MIN_DIM = cropsize #math.ceil(mindim / 256) * 256
@@ -199,7 +201,7 @@ class CleanMask():
     """
     Use the cleanup function to fix overlapping and split instances generated from stitched_inference.
     """
-
+    # TGAR, stitching algorithm doesn't work yet. Instances that are overlapping in stitch-overlap regions are merged.
     def __init__(self, stack, num_times_visited):
         sys.setrecursionlimit(50000)
 

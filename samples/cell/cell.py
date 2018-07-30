@@ -28,16 +28,16 @@ class CellsConfig(Config):
     
     GPU_COUNT = 1
     
-    # To Reddy and George (TRAG), img/gpu could be increased to maximize training (i think I'm undersaturating the GPU so maybe we can increase this later)
+    # To George and Reddy (TGAR), img/gpu could be increased to maximize training (i think I'm undersaturating the GPU so maybe we can increase this later)
     IMAGES_PER_GPU = 2
     
     NUM_CLASSES = 1+1 # background + cell
     
-    # TRAG, change the following values based on the input size for training
+    # TGAR, change the following values based on the input size for training
     IMAGE_MIN_DIM = 256
     IMAGE_MAX_DIM = 1024 
 
-    # TRAG, RPN_ANCHOR_SCALES can be decreased for smaller images. For example, the caltech images have very small cells so the following value can be decreased
+    # TGAR, RPN_ANCHOR_SCALES can be decreased for smaller images. For example, the caltech images have very small cells so the following value can be decreased
     # Use smaller anchors because our image and objects are small
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  # anchor side in pixels
 
@@ -81,7 +81,7 @@ class CellsDataset(utils.Dataset):
            
     def load_cells(self, dataset_dir, subset):
         """Loads cell images from the dataset directory"""
-        
+        # TGAR, loading cells can be optimized by uploading and splitting data directly from numpy arrays intead of turning them into tif files.
         # Add class
         self.add_class("cells", 1, "cellobj")
         
@@ -187,8 +187,13 @@ def train(dataset_dir, augmentation=None, init_with='coco', model_dir=None):
     elif init_with == "last":
         # Load the last model you trained and continue training
         model.load_weights(model.find_last()[1], by_name=True)
-
+    
+    else:
+        if os.path.exists(init_with):
+            model.load_weights(init_with, by_name=True)
+  
     ### TRAIN THE MODEL
+    # TGAR, modify how to train model. Epochs accumulate (ex. line first call to model.train means train epochs 1-75 and second call to train means train from epochs 75-100.
     DEVICE = '/device:GPU:0'
     with tf.device(DEVICE): 
         

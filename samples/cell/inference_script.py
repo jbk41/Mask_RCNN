@@ -29,7 +29,9 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
-    
+
+
+    # TGAR, something weird - I trained the model by with 16bit images but when I ran inference, I got much better results passing in 8bit images. I have not figured out why the program has trouble with displaying and running inference on 16 bit images. So here, I am converting the image to 8bit before running inference.    
     image = preprocess(args.image)
     padding = int(args.padding)
     cropsize = int(args.cropsize) 
