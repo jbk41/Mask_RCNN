@@ -74,7 +74,6 @@ dependencies:
     - kiwisolver==1.0.1
     - libtiff==0.4.2
     - markupsafe==1.0
-    - mask-rcnn==2.1
     - matplotlib==2.2.2
     - mistune==0.8.3
     - nbconvert==5.3.1
