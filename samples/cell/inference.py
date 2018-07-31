@@ -7,6 +7,8 @@ import skimage.io
 import sys
 import skimage
 from PIL import Image
+from libtiff import TIFF
+
 
 def generate_inference_model(model_path, cropsize):
     """
@@ -18,9 +20,7 @@ def generate_inference_model(model_path, cropsize):
         IMAGES_PER_GPU = 1
         # comment below if running inference on small crops
         TRAIN_ROIS_PER_IMAGE = 2000
-        # TGAR, change POST_NMS_ROIS_INFERENCE if you feel it is necessary. Higher ROIS means it will be easier to detect object when there are many instances. However, if there are too many ROIS and not many objects, many pseudo objects will be identified. I noticed that the some masks generated will take up the entire screen when ROIS is too high.
         POST_NMS_ROIS_INFERENCE = 10000
-        # Increase for caltech images, decrease for images with few cells
         DETECTION_MAX_INSTANCES = 200
         #DETECTION_NMS_THRESHOLD = 0.35
         IMAGE_MIN_DIM = cropsize #math.ceil(mindim / 256) * 256
@@ -64,7 +64,7 @@ def run_inference(model, image):
     return masks
 
 
-def mask_stack_to_single_image(masks):
+def mask_stack_to_single_image(masks, checkpoint_id):
     """
     Merge a stack of masks containing multiple instances to one large image.
 
@@ -75,12 +75,10 @@ def mask_stack_to_single_image(masks):
     Returns:
         image that is the same shape as the original raw image, containing all of the masks from the mask stack
     """
-
-
-    image = np.zeros((masks.shape[0:2])) # image that contains all cells (0 bg, >0 is cell id)
+    image = np.zeros((masks.shape[0:2]),dtype=np.uint16) # image that contains all cells (0 bg, >0 is cell id)
     
     # switch shape to [num_masks, h, w] from [h, w, num_masks]
-    masks = masks.astype('uint16') 
+    masks = masks.astype(np.uint16) 
     #masks = np.moveaxis(masks, 0, -1)
     masks = np.moveaxis(masks, -1, 0) 
     
@@ -88,15 +86,14 @@ def mask_stack_to_single_image(masks):
     #image = np.zeros(image_shape[1:])
     #print(image.shape)
     num_masks = masks.shape[0] # shape = [n, h, w]
-    
-    current_id = 1
-    
+        
     for i in range(num_masks):
         current_mask = masks[i]
-        image = add_mask_to_ids(image, current_mask, current_id)
-        current_id += 1
+        image = add_mask_to_ids(image, current_mask, checkpoint_id)
+        checkpoint_id += 1
         
-    return image
+    return image, checkpoint_id
+
 
 
 def add_mask_to_ids(image, mask, fill_int):
@@ -116,7 +113,7 @@ def pad(arrays, reference, offsets):
     offsets: list of offsets (number of elements must be equal to the dimension of the array)
     """
     # Create an array of zeros with the reference shape
-    result = np.zeros((reference[0],reference[1]), dtype='uint16')
+    result = np.zeros((reference[0],reference[1]), dtype=np.uint16)
     print('result:')
     print(result.shape)
     # Create a list of slices from offset to offset + shape in each dimension
@@ -134,8 +131,7 @@ def stitched_inference(image, cropsize, model, padding=40):#, minsize=100):
     reference: Reference array with the desired shape
     offsets: list of offsets (number of elements must be equal to the dimension of the array)
     """
-
-    stack = np.zeros((image.shape[0], image.shape[1],1)) # make new image of zeros (exclude third dimension, not using rgb)
+    stack = np.zeros((image.shape[0], image.shape[1],1),dtype=np.uint16) # make new image of zeros (exclude third dimension, not using rgb)
     visited = np.zeros(image.shape[0:2])
     num_times_visited = np.zeros(image.shape[0:2])
     
@@ -147,7 +143,7 @@ def stitched_inference(image, cropsize, model, padding=40):#, minsize=100):
         
     #rowlist = np.concatenate(([0],np.arange(cropsize-padding, num_row, cropsize)))
     #collist = np.concatenate(([0],np.arange(cropsize-padding, num_col, cropsize)))
-    
+    checkpoint_id = 1
     for row in np.arange(0, num_row, cropsize-padding): # row defines the rightbound side of box
         for col in np.arange(0, num_row, cropsize-padding): # col defines lowerbound of box
             masks_with_ids = np.zeros(image.shape[0:2])
@@ -187,7 +183,7 @@ def stitched_inference(image, cropsize, model, padding=40):#, minsize=100):
             #print('mask shape:')
             #print (padded_masks.shape)
             
-            one_inference_mask_image = mask_stack_to_single_image(masks) # works
+            one_inference_mask_image, checkpoint_id = mask_stack_to_single_image(masks, checkpoint_id) # works
             padded_inference_mask = pad(one_inference_mask_image, [num_row, num_col], [upperbound,leftbound])
             padded_inference_mask = np.expand_dims(padded_inference_mask, axis=2)
             stack = np.concatenate((stack, padded_inference_mask), axis=2)
@@ -196,32 +192,22 @@ def stitched_inference(image, cropsize, model, padding=40):#, minsize=100):
     return stack, num_times_visited
 
 
-
 class CleanMask():
-    """
-    Use the cleanup function to fix overlapping and split instances generated from stitched_inference.
-    """
-    # TGAR, stitching algorithm doesn't work yet. Instances that are overlapping in stitch-overlap regions are merged.
-    def __init__(self, stack, num_times_visited):
-        sys.setrecursionlimit(50000)
-
+    def __init__(self, stack, threshold, num_times_visited):
         ## input 
         self.stack = stack #stack of masks
         self.num_times_visited = num_times_visited #how many times inference ran on each pixel
         
         self.num_row = self.stack.shape[0]
         self.num_col = self.stack.shape[1]
-        self.masks = np.zeros((self.num_row, self.num_col))
-        self.visitedPoints = np.zeros((self.num_row, self.num_col))
-        self.id = 0
+        self.masks = np.zeros((self.num_row, self.num_col), dtype=np.uint16)
+        #self.visitedPoints = np.zeros((self.num_row, self.num_col))
+        self.id = 1
+        self.dict = {}
+        self.unique = {}
+        self.cells = {}
+        self.threshold = threshold
         
-    def inBounds(self, row, col):
-        if (row < 0 or row >= self.num_row):
-            return False
-        if (col < 0 or col >= self.num_col):
-            return False
-        return True
-    
     def getMasks(self):
         return self.masks
     
@@ -230,11 +216,12 @@ class CleanMask():
             return True
     
     def get_ids(self, array):
-        ids = []
+        ids = set()
         for value in array:
             if value > 0:
-                ids.append(value)
-        return ids
+                ids.add(value)
+        frozen_set_ids = frozenset(ids)
+        return frozen_set_ids
     
     def at_least_one(self, values, ids):
         for value in values:
@@ -242,94 +229,56 @@ class CleanMask():
                 return True
         return False
     
-    def dfs_specific(self, row, col, values):
-        if not self.visited(row,col):
-            ids = self.get_ids(self.stack[row,col,:])
-            if len(ids) == 1 and self.num_times_visited[row,col] > 1:
-                values.append(ids[0])
-            
-            if self.at_least_one(values,ids):
-                self.masks[row,col] = self.id
-            self.visitedPoints[row,col] = 1
-
-            if self.inBounds(row+1, col):
-                if self.at_least_one(values,ids):
-                    self.dfs_specific(row+1, col, values)
-                    
-            if self.inBounds(row, col+1):
-                if self.at_least_one(values,ids):
-                    self.dfs_specific(row, col+1, values)
-                    
-            if self.inBounds(row, col-1):
-                if self.at_least_one(values,ids):
-                    self.dfs_specific(row, col-1, values)
-            
-            if self.inBounds(row-1, col):
-                if self.at_least_one(values,ids):
-                    self.dfs_specific(row-1, col, values)
-    
-    
-    def dfs_normal(self, row, col):
-        if not self.visited(row,col):
-            ids = self.get_ids(self.stack[row,col,:])
-            if len(ids) > 1:
-                self.masks[row,col] = self.id
-            self.visitedPoints[row,col] = 1
-        
-            if self.inBounds(row+1, col):
-                if len(self.get_ids(self.stack[row+1,col,:])) > 0 :
-                    self.dfs_normal(row+1, col)
-                    
-            if self.inBounds(row, col+1):
-                if len(self.get_ids(self.stack[row,col+1,:])) > 0:
-                    self.dfs_normal(row, col+1)
-                    
-            if self.inBounds(row, col-1):
-                if len(self.get_ids(self.stack[row,col-1,:])) > 0:
-                    self.dfs_normal(row, col-1)
-            
-            if self.inBounds(row-1, col):
-                if len(self.get_ids(self.stack[row-1,col,:])) > 0:
-                    self.dfs_normal(row-1, col)
-    
-    
     def cleanup(self):
-        # algorithm:
-        # go through every pixel. If you have not 'visited' this pixel, then check to see if this is a unique inference
-        # pixel, meaning make sure this pixel only had inference run on it once (not an intersection point). 
-        
-        # If this pixel has unique inference, then check to see if it was only assigned a cell value (not bg). 
-        # If not, add the pixel to visited. Else, do dfs on that pixel and assign all touching pixels that have also 
-        # been assigned the pixel value to a new value.
-        
-        # For the remaining pixels that have not been visited yet (the intersection points minus the cells that have
-        # shared cell ids), do regular dfs on them
         for row in range(self.num_row):
             for col in range(self.num_col):
-                if not self.visited(row,col) and self.num_times_visited[row,col] == 1:
-                    all_pixel_values = self.stack[row,col,:] # get every value the model predicted for a single pixel in every inference result
-                    ids = self.get_ids(all_pixel_values)
-                    if len(ids) == 0:
-                        self.visitedPoints[row,col] = 1
-                        self.masks[row,col] = 0
-                        
-                    if len(ids) == 1:
-                        self.id += 1
-                        self.dfs_specific(row,col, ids)
+                if self.num_times_visited[row,col] > 1:
+                    set_of_ids = self.get_ids(self.stack[row,col,:])
+                    if len(set_of_ids) > 1:
+                        if set_of_ids not in self.dict.keys():
+                            self.dict[set_of_ids] = 0
+                        self.dict[set_of_ids] += 1            
+           
          
-                  
+        oneinf = {}
         for row in range(self.num_row):
             for col in range(self.num_col):
-                if not self.visited(row,col):
-                    all_pixel_values = self.stack[row,col,:] # get every value the model predicted for a single pixel in every inference result
-                    ids = self.get_ids(all_pixel_values)
-                    if len(ids) >= 1:
-                        self.id += 1
-                        self.dfs_normal(row,col)
+                if self.num_times_visited[row,col] == 1:
+                    set_of_ids = self.get_ids(self.stack[row,col,:])
+                    if len(set_of_ids) > 0:
+                        if set_of_ids not in oneinf.keys():
+                            oneinf[set_of_ids] = 0
+                        oneinf[set_of_ids] += 1
         
+        for set_of_ids in oneinf:
+            if oneinf[set_of_ids] >= self.threshold:
+                self.unique[set_of_ids] = self.id
+                self.id += 1
+        
+        for set_of_ids in self.dict:
+            if len(set_of_ids) > 1 and self.dict[set_of_ids] >= self.threshold:
+                self.unique[set_of_ids] = self.id
+                self.id += 1
+                for cell_id in set_of_ids:
+                    temp = frozenset([cell_id])
+                    if temp in oneinf.keys():
+                        if oneinf[temp] >= self.threshold:
+                            self.unique[temp] = self.unique[set_of_ids]
+                            
+        for row in range(self.num_row):
+            for col in range(self.num_col):
+                set_of_ids = self.get_ids(self.stack[row,col,:])
+                if len(set_of_ids) > 0:
+                    if set_of_ids in self.unique.keys():
+                        self.masks[row,col] = self.unique[set_of_ids]
+                        
+                
+
+       
     def save(self, save_path):
-        from scipy.misc import imsave
-        imsave(save_path, self.getMasks())
+        tiff = TIFF.open(save_path, mode='w')
+        tiff.write_image(self.getMasks())
+        tiff.close()
 
 def map_uint16_to_uint8(img, lower_bound=None, upper_bound=None):
     '''
@@ -383,3 +332,4 @@ def preprocess(img):
 
 
     
+   

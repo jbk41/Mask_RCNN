@@ -26,23 +26,26 @@ if __name__ == '__main__':
     parser.add_argument('--padding', required=False,
                         default='40',
                         help='Amount of overlapping pixels along one axis') 
+    parser.add_argument('--threshold', required=False,
+                        default='30',
+                        help='Min number of pixels belonging to a cell.')
 
 
     args = parser.parse_args()
-
-
-    # TGAR, something weird - I trained the model by with 16bit images but when I ran inference, I got much better results passing in 8bit images. I have not figured out why the program has trouble with displaying and running inference on 16 bit images. So here, I am converting the image to 8bit before running inference.    
+    
     image = preprocess(args.image)
     padding = int(args.padding)
     cropsize = int(args.cropsize) 
+    threshold = int(args.threshold)
 
     model = generate_inference_model(args.model, 512)
     import time
     start = time.time()
     stitched_inference_stack, num_times_visited = stitched_inference(image, cropsize, model, padding=padding)
-    masks = CleanMask(stitched_inference_stack, num_times_visited)
+    masks = CleanMask(stitched_inference_stack, threshold, num_times_visited)
     masks.cleanup()
     masks.save(args.output)
     end = time.time()
     
     print('Done. Saved masks to {}. Took {} seconds'.format(args.output, end-start)) 
+
