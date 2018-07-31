@@ -1,6 +1,16 @@
 from cell import train
 from imgaug import augmenters as iaa
 
+import os
+import sys
+import random
+import numpy as np
+import cv2
+import skimage.io
+import warnings; warnings.simplefilter('ignore')
+import time
+
+
 ####################################################################
 # Augmentations 
 ####################################################################
@@ -55,7 +65,7 @@ augmentation = iaa.Sometimes(.5, [
         BBaug,
         BCaug,
         Faug,
-        Taug
+	Taug
     ])
 
 
