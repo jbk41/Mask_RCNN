@@ -240,10 +240,62 @@ def train(dataset_dir, augmentation=None, init_with='coco', model_dir=None):
     # TGAR, modify how to train model. Epochs accumulate (ex. line first call to model.train means train epochs 1-75 and second call to train means train from epochs 75-100.
     DEVICE = '/device:GPU:0'
     with tf.device(DEVICE): 
-        
+    
         train_heads_start = time.time() 
         model.train(dataset_train, dataset_test, 
                     learning_rate=config.LEARNING_RATE,
                     augmentation=augmentation, 
-                    epochs=1,
+                    epochs=75,
                     layers='heads')
+
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 10, 
+                    augmentation=augmentation, 
+                    epochs=100,
+                    layers='heads')
+
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 100,
+                    augmentation=augmentation, 
+                    epochs=125,
+                    layers='heads')
+        train_heads_end = time.time()
+        train_heads_time = train_heads_end - train_heads_start
+        print('\n Done training heads. Took {} seconds'.format(train_heads_time))
+
+        # Fine tune all layers
+        # Passing layers="all" trains all layers. You can also 
+        # pass a regular expression to select which layers to
+        # train by name pattern.
+        train_all_start = time.time() 
+
+        t1s = time.time()
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 10, 
+                    #augmentation=augmentation,
+                    epochs=150, 
+                    layers="all")
+        t1e = time.time()
+        print(t1e-t1s)
+
+        t2s = time.time()
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 100,
+                    #augmentation=augmentation,
+                    epochs=175, 
+                    layers="all")
+        t2e = time.time()
+        print(t2e-t2s)
+
+        t3s = time.time()
+        model.train(dataset_train, dataset_test, 
+                    learning_rate=config.LEARNING_RATE / 1000,
+                    #augmentation=augmentation,
+                    epochs=200, 
+                    layers="all")
+        t3e = time.time()
+        print(t3e-t3s)    
+
+        train_all_end = time.time() 
+        train_all_time = train_all_end - train_all_start
+        print('\n Done training all layers. Took {} seconds'.format(train_all_time))
